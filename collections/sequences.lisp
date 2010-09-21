@@ -15,7 +15,7 @@
   (:use :cl :as)
   (:nicknames "SEQ")
   (:shadow "FIND" "INTERSECTION" "LENGTH" "POSITION" "REDUCE" "REVERSE"
-           "SORT" "UNION")
+           "SEQUENCE" "SORT" "UNION")
   (:export "CONCAT" "CONTAINS?" "DIFFERENCE" "DROP" "DROP-WHILE" "ELEMENT" "EVERY?" "FILTER" "FIND"
            "HEAD" "IMAGE" "INTERLEAVE" "INTERPOSE" "INTERSECTION" "LENGTH"
            "MAKE" "MAKE-AS"
