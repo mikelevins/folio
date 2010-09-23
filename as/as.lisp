@@ -9,8 +9,6 @@
 ;;;;
 ;;;; ***********************************************************************
 
-
-
 (in-package :cl-user)
 
 (defpackage "FOLIO.AS"
@@ -79,8 +77,9 @@
   (if (symbol-package thing)
       (concatenate 'string 
                    (package-name (symbol-package thing))
-                   "::"
-                   (symbol-name thing))
+                   "::|"
+                   (symbol-name thing)
+                   "|")
       (concatenate 'string 
                    "#:|"
                    (symbol-name thing)
