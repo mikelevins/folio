@@ -14,7 +14,8 @@
 (defpackage "FOLIO.FUNCTIONS"
   (:use :cl :fn)
   (:nicknames "FUN")
-  (:export "COMPOSE" "FLIP" "PARTIAL"))
+  (:export "COMPOSE" "CONJOIN" "DISJOIN" "FLIP" "PARTIAL"
+           "ROTATE-LEFT" "ROTATE-RIGHT"))
 
 (in-package :FUN)
 
