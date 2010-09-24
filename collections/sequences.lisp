@@ -16,8 +16,8 @@
   (:nicknames "SEQ")
   (:shadow "FIND" "INTERSECTION" "LENGTH" "POSITION" "REDUCE" "REVERSE"
            "SEQUENCE" "SORT" "UNION")
-  (:export "CONCAT" "CONTAINS?" "DIFFERENCE" "DROP" "DROP-WHILE" "ELEMENT" "EVERY?" "FILTER" "FIND"
-           "HEAD" "IMAGE" "INTERLEAVE" "INTERPOSE" "INTERSECTION" "LENGTH"
+  (:export "CONCAT" "CONTAINS?" "DIFFERENCE" "DROP" "DROP-WHILE" "ELEMENT" "EMPTY?" "EVERY?" "FILTER"
+           "FIND" "HEAD" "IMAGE" "INTERLEAVE" "INTERPOSE" "INTERSECTION" "LENGTH"
            "MAKE" "MAKE-AS"
            "PARTITION" "POSITION" "RANGE" "REDUCE" "REPEAT" "REVERSE"
            "SEQUENCE" "SLICE" "SOME?" "SORT" "TAIL" "TAKE" "TAKE-WHILE"
@@ -126,6 +126,12 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod element (s n) (fset:@ s n))
+
+;;; ---------------------------------------------------------------------
+;;; empty?
+;;; ---------------------------------------------------------------------
+
+(defmethod empty? (s) (fset:empty? s))
 
 ;;; ---------------------------------------------------------------------
 ;;; every?

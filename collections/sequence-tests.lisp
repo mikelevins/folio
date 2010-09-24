@@ -126,8 +126,79 @@
   (let ((s1 (list 1 1 1 2 2 2))
         (s2 (list 1 1 1))
         (s3 (list 2 2 2)))
-    (ensure (equal s3(seq:drop-while 'oddp s1)))
+    (ensure (equal s3 (seq:drop-while 'oddp s1)))
+    (ensure (eql :equal (fset:compare (as 'fset:seq s3) (seq:drop-while 'oddp (as 'fset:seq s1)))))
     (ensure (equal s2(seq:drop-while 'evenp s1 :from-end? t)))))
+
+(addtest (sequence-api-tests)
+  test-element
+  (let ((l (list 0 1 2 3 4 5))
+        (v (vector 0 1 2 3 4 5))
+        (s "012345")
+        (f (fset:seq 0 1 2 3 4 5)))
+    (ensure (eql 3 (seq:element l 3)))
+    (ensure (eql 3 (seq:element v 3)))
+    (ensure (char= #\3 (seq:element s 3)))
+    (ensure (eql 3 (seq:element f 3)))))
+
+(addtest (sequence-api-tests)
+  test-empty?
+  (let ((l (list 0 1 2 3 4 5)))
+    (ensure (seq:empty? nil))
+    (ensure (seq:empty? (fset:seq)))
+    (ensure (not (seq:empty? (as 'fset:seq l))))))
+
+(addtest (sequence-api-tests)
+  test-every
+  (let ((l (list 0 1 2 3 4 5)))
+    (ensure (seq:every? 'integerp l))
+    (ensure (not (seq:every? 'oddp l)))
+    (ensure (seq:every? 'integerp (as 'fset:seq l)))
+    (ensure (not (seq:every? 'oddp (as 'fset:seq l))))))
+
+(addtest (sequence-api-tests)
+  test-filter
+  (let ((l (list 0 1 2 3 4 5)))
+    (ensure (seq:empty? (seq:filter 'stringp l)))
+    (ensure (seq:empty? (seq:filter 'stringp (as 'fset:seq l))))
+    (ensure (not (seq:empty? (seq:filter 'oddp l))))
+    (ensure (not (seq:empty? (seq:filter 'oddp (as 'fset:seq l)))))))
+
+(addtest (sequence-api-tests)
+  test-find
+  (let ((l (list 0 1 2 3 4 5)))
+    (ensure (seq:find 'oddp l))
+    (ensure (not (seq:find 'stringp l)))
+    (ensure (seq:find 'oddp (as 'fset:seq l)))
+    (ensure (not (seq:find 'stringp (as 'fset:seq l) :from-end? t)))))
+
+(addtest (sequence-api-tests)
+  test-head
+  (let ((l (list 0 1 2 3 4 5)))
+    (ensure (zerop (seq:head l)))
+    (ensure (zerop (seq:head (as 'vector l))))
+    (ensure (zerop (seq:head (as 'fset:seq l))))))
+
+(addtest (sequence-api-tests)
+  test-image
+  (let ((l (list 0 1 2 3 4 5)))
+    (ensure (seq:every? 'floatp (seq:image 'float l)))
+    (ensure (seq:every? 'floatp (seq:image 'float (as 'vector l))))
+    (ensure (seq:every? 'floatp (seq:image 'float (as 'fset:seq l))))))
+
+(addtest (sequence-api-tests)
+  test-interleave
+  (let ((l (list 0 2 4))
+        (v (list 1 3 5)))
+    (ensure (oddp (seq:element (seq:interleave l v) 3)))
+    (ensure (evenp (seq:element (seq:interleave (as 'fset:seq l) v) 4)))))
+
+(addtest (sequence-api-tests)
+  test-interleave
+  (let ((l (list 0 2 4))
+        (s ","))
+    (ensure (evenp (seq:element (seq:interpose s l) 2)))
+    (ensure (stringp (seq:element (seq:interpose s l) 3)))))
 
 ;;; (setf *TEST-DESCRIBE-IF-NOT-SUCCESSFUL?* t)
 ;;; (lift:run-tests :suite 'sequence-api-tests)
