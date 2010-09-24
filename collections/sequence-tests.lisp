@@ -55,7 +55,7 @@
   (let* ((s "A test string")
          (f (as 'fset:seq s)))
     (ensure (every (fn (e)(fset:find e s))
-                   s))))
+                   (as 'list f)))))
 
 (addtest (sequence-as-tests)
   test-fset-seq-to-string
@@ -239,6 +239,13 @@
     (ensure (vectorp s2))
     (ensure (stringp s3))
     (ensure (typep s4 'fset:seq))))
+
+(addtest (sequence-api-tests)
+  test-partition
+  (let ((s (list 1 :two 3 :four 5 :six 7 :eight)))
+    (ensure (seq:every? 'numberp (seq:image 'seq:head (seq:partition 1 s :step 2))))
+    (ensure (= 2 (seq:length (seq:partition 4 (as 'fset:seq s)))))))
+
 
 ;;; (setf *TEST-DESCRIBE-IF-NOT-SUCCESSFUL?* t)
 ;;; (lift:run-tests :suite 'sequence-api-tests)

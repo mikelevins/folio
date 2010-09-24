@@ -229,11 +229,15 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod partition (n s &key step)
-  (let ((step (or step n)))
-    (if (<= (length s) n)
-        (sequence s)
-        (concat (sequence (take n s))
-                (partition n (drop step s) :step step)))))
+  (let ((result-class (classname-for-sequence s))
+        (step (or step n)))
+    (if (empty? s)
+        (as result-class s)
+        (if (<= (length s) n)
+            (as result-class (list s))
+            (as result-class
+                (concat (as result-class (list (take n s)))
+                        (partition n (drop step s) :step step)))))))
 
 ;;; ---------------------------------------------------------------------
 ;;; position
