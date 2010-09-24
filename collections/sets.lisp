@@ -81,11 +81,11 @@
 (defmethod difference ((set1 cl:list)(set2 cl:list) &key (test 'eql) &allow-other-keys)
   (cl:set-difference set1 set2 :test test))
 
-(defmethod difference ((set1 fset:set)(set2 fset:set) &key (test 'eql) &allow-other-keys)
-  (fset:set-difference set1 set2 :test test))
+(defmethod difference ((set1 fset:set)(set2 fset:set) &key &allow-other-keys)
+  (fset:set-difference set1 set2))
 
-(defmethod difference ((set1 fset:set)(set2 cl:list) &key (test 'eql) &allow-other-keys)
-  (fset:set-difference set1 (as 'fset:set set2) :test test))
+(defmethod difference ((set1 fset:set)(set2 cl:list) &key  &allow-other-keys)
+  (fset:set-difference set1 (as 'fset:set set2)))
 
 (defmethod difference ((set1 cl:list)(set2 fset:set) &key (test 'eql) &allow-other-keys)
   (cl:set-difference set1 (as 'list set2) :test test))
@@ -97,11 +97,11 @@
 (defmethod intersection ((set1 cl:list)(set2 cl:list) &key (test 'eql) &allow-other-keys)
   (cl:intersection set1 set2 :test test))
 
-(defmethod intersection ((set1 fset:set)(set2 fset:set) &key (test 'eql) &allow-other-keys)
-  (fset:intersection set1 set2 :test test))
+(defmethod intersection ((set1 fset:set)(set2 fset:set) &key &allow-other-keys)
+  (fset:intersection set1 set2))
 
-(defmethod intersection ((set1 fset:set)(set2 cl:list) &key (test 'eql) &allow-other-keys)
-  (intersection set1 (as 'fset:set set2) :test test))
+(defmethod intersection ((set1 fset:set)(set2 cl:list) &key &allow-other-keys)
+  (intersection set1 (as 'fset:set set2)))
 
 (defmethod intersection ((set1 cl:list)(set2 fset:set) &key (test 'eql) &allow-other-keys)
   (intersection set1 (as 'list set2) :test test))
@@ -135,11 +135,11 @@
 (defmethod union ((set1 cl:list)(set2 cl:list) &key (test 'eql) &allow-other-keys)
   (cl:union set1 set2 :test test))
 
-(defmethod union ((set1 fset:set)(set2 fset:set) &key (test 'eql) &allow-other-keys)
-  (fset:union set1 set2 :test test))
+(defmethod union ((set1 fset:set)(set2 fset:set) &key &allow-other-keys)
+  (fset:union set1 set2))
 
-(defmethod union ((set1 fset:set)(set2 cl:list) &key (test 'eql) &allow-other-keys)
-  (union set1 (as 'fset:set set2) :test test))
+(defmethod union ((set1 fset:set)(set2 cl:list) &key &allow-other-keys)
+  (union set1 (as 'fset:set set2)))
 
 (defmethod union ((set1 cl:list)(set2 fset:set) &key (test 'eql) &allow-other-keys)
-  (union set1 (as 'list set2) :test test))
+  (cl:union set1 (as 'list set2) :test test))

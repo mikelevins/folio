@@ -4,22 +4,22 @@
 
 (in-package :cl-user)
 
-(defpackage "FOLIO.COLLECTIONS.TEST"
+(defpackage "FOLIO.COLLECTIONS.SETS.TEST"
   (:use :cl :as :fn :lift))
 
-(in-package :folio.collections.test)
+(in-package :folio.collections.sets.test)
 
 ;;; ---------------------------------------------------------------------
 ;;; common suite class
 ;;; ---------------------------------------------------------------------
 
-(deftestsuite collections-tests () ())
+(deftestsuite set-tests () ())
 
 ;;; ---------------------------------------------------------------------
 ;;;  set AS tests
 ;;; ---------------------------------------------------------------------
 
-(deftestsuite set-as-tests (collections-tests) ())
+(deftestsuite set-as-tests (set-tests) ())
 
 (addtest (set-as-tests)
   test-fset-set-to-fset-set
@@ -112,7 +112,7 @@
 ;;;  set API tests
 ;;; ---------------------------------------------------------------------
 
-(deftestsuite set-api-tests (collections-tests) ())
+(deftestsuite set-api-tests (set-tests) ())
 
 (addtest (set-api-tests)
   test-adjoin
@@ -121,7 +121,58 @@
   (ensure (set:contains? (set:adjoin 12345 (set:make 0 1 2 3))
                      12345)))
 
+(addtest (set-api-tests)
+  test-contains?
+  (ensure (set:contains? (set:make 0 1 2 3) 3))
+  (ensure (set:contains? (list 0 1 2 3) 3))
+  (ensure (not (set:contains? (set:make 0 1 2 3) 5)))
+  (ensure (not (set:contains? (list 0 1 2 3) 5))))
+
+(addtest (set-api-tests)
+  test-difference
+  (let ((s1 (list 0 1 2 3 4 5))
+        (s2 (list 3 4 5))
+        (expected (list 0 1 2)))
+    (ensure (eql :equal (fset:compare (as 'fset:set expected)
+                                      (set:difference (as 'fset:set s1)
+                                                      (as 'fset:set s2)))))
+    (ensure (null (set:difference expected (set:difference s1 s2))))))
+
+(addtest (set-api-tests)
+  test-intersection
+  (let ((s1 (list 0 1 2 3 4 5))
+        (s2 (list 3 4 5 6 7 8))
+        (expected (list 3 4 5)))
+    (ensure (eql :equal (fset:compare (as 'fset:set expected)
+                                      (set:intersection (as 'fset:set s1)
+                                                      (as 'fset:set s2)))))
+    (ensure (null (set:difference expected (set:intersection s1 s2))))))
+
+(addtest (set-api-tests)
+  test-subset?
+  (let ((s1 (list 0 1 2 3 4 5))
+        (s2 (list 3 4 5)))
+    (ensure (set:subset? s2 s1))
+    (ensure (set:subset? (as 'fset:set s2) (as 'fset:set s1)))))
+
+(addtest (set-api-tests)
+  test-union
+  (let ((s1 (list 0 1 2))
+        (s2 (list 3 4 5))
+        (expected (list 0 1 2 3 4 5)))
+    (ensure (null (set:difference expected (set:union s1 s2))))
+    (ensure (null (set:difference (set:union s1 s2) expected)))
+    (ensure (eql :equal (fset:compare (as 'fset:set expected)
+                                      (set:union (as 'fset:set s1) (as 'fset:set s2)))))))
 
 ;;; (setf *TEST-DESCRIBE-IF-NOT-SUCCESSFUL?* t)
 ;;; (lift:run-tests :suite 'set-api-tests)
+
+;;; ---------------------------------------------------------------------
+;;; run all tests
+;;; ---------------------------------------------------------------------
+;;; (setf *TEST-DESCRIBE-IF-NOT-SUCCESSFUL?* t)
+;;; (lift:run-tests :suite 'set-tests)
+
+
 

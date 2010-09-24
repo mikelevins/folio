@@ -32,7 +32,7 @@
 
 (defsystem folio
   :serial t
-  :depends-on (:as :collections))
+  :depends-on (:as :collections :functions))
 
 (in-package :cl-user)
 
