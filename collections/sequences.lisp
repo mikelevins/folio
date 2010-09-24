@@ -20,7 +20,7 @@
            "FIND" "HEAD" "IMAGE" "INTERLEAVE" "INTERPOSE" "INTERSECTION" "LENGTH"
            "MAKE" "MAKE-AS"
            "PARTITION" "POSITION" "RANGE" "REDUCE" "REPEAT" "REVERSE"
-           "SEQUENCE" "SLICE" "SOME?" "SORT" "TAIL" "TAKE" "TAKE-WHILE"
+           "SEQUENCE?" "SLICE" "SOME?" "SORT" "TAIL" "TAKE" "TAKE-WHILE"
            "UNION" "UNIQUE" "ZIP"))
 
 (in-package :seq)
@@ -269,11 +269,14 @@
 (defmethod reverse (s)(fset:reverse s))
 
 ;;; ---------------------------------------------------------------------
-;;; sequence
+;;; sequence?
 ;;; ---------------------------------------------------------------------
 
-(defun sequence (&rest elements)
-  (as 'fset:seq elements))
+(defmethod sequence? (x) nil)
+(defmethod sequence? ((s list)) t)
+(defmethod sequence? ((s vector)) t)
+(defmethod sequence? ((s string)) t)
+(defmethod sequence? ((s fset:seq)) t)
 
 ;;; ---------------------------------------------------------------------
 ;;; slice

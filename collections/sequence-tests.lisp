@@ -194,11 +194,51 @@
     (ensure (evenp (seq:element (seq:interleave (as 'fset:seq l) v) 4)))))
 
 (addtest (sequence-api-tests)
-  test-interleave
+  test-interpose
   (let ((l (list 0 2 4))
         (s ","))
     (ensure (evenp (seq:element (seq:interpose s l) 2)))
     (ensure (stringp (seq:element (seq:interpose s l) 3)))))
+
+(addtest (sequence-api-tests)
+  test-intersection
+  (let ((s1 (list 0 1 2 3 4 5))
+        (s2 (list 3 4 5 6 7 8))
+        (expected (list 3 4 5)))
+    (ensure (seq:empty? (seq:difference  (as 'fset:seq expected)
+                                         (seq:intersection (as 'fset:seq s1)
+                                                           (as 'fset:seq s2)))))
+    (ensure (seq:empty? (seq:difference  (seq:intersection (as 'fset:seq s1)
+                                                           (as 'fset:seq s2))
+                                         (as 'fset:seq expected))))
+    (ensure (null (seq:difference expected (seq:intersection s1 s2))))
+    (ensure (null (seq:difference (seq:intersection s1 s2) expected)))))
+
+(addtest (sequence-api-tests)
+  test-length
+  (let ((s0 (list))
+        (s1 (list 1))
+        (s2 (list 1 2))
+        (s10 (list 1 2 3 4 5 6 7 8 9 10)))
+    (ensure (zerop (seq:length s0)))
+    (ensure (zerop (seq:length (as 'vector s0))))
+    (ensure (zerop (seq:length (as 'fset:seq s0))))
+    (ensure (= 1 (seq:length s1)))
+    (ensure (= 2 (seq:length (as 'vector s2))))
+    (ensure (= 10 (seq:length (as 'fset:seq s10))))))
+
+(addtest (sequence-api-tests)
+  test-make
+  (let ((s0 (seq:make 0 1 2 3))
+        (s1 (seq:make-as 'list 0 1 2 3))
+        (s2 (seq:make-as 'vector 0 1 2 3))
+        (s3 (seq:make-as 'string #\0 #\1 #\2 #\3))
+        (s4 (seq:make-as 'fset:seq 0 1 2 3)))
+    (ensure (seq:sequence? s0))
+    (ensure (listp s1))
+    (ensure (vectorp s2))
+    (ensure (stringp s3))
+    (ensure (typep s4 'fset:seq))))
 
 ;;; (setf *TEST-DESCRIBE-IF-NOT-SUCCESSFUL?* t)
 ;;; (lift:run-tests :suite 'sequence-api-tests)
