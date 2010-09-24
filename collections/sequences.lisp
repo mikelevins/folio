@@ -12,7 +12,7 @@
 (in-package :cl-user)
 
 (defpackage "FOLIO.COLLECTIONS.SEQUENCES"
-  (:use :cl :as)
+  (:use :cl :as :fn)
   (:nicknames "SEQ")
   (:shadow "FIND" "INTERSECTION" "LENGTH" "POSITION" "REDUCE" "REVERSE"
            "SEQUENCE" "SORT" "UNION")
@@ -59,6 +59,11 @@
 (defmethod as ((class (eql 'fset:seq)) (thing cl:string) &key &allow-other-keys)
   (fset:convert 'fset:seq thing))
 
+(defmethod as ((class (eql 'string)) (thing fset:seq) &key &allow-other-keys)
+  (if (fset::every 'characterp thing)
+      (as 'string (as 'vector thing))
+      (format nil "~S" thing)))
+
 (defmethod as ((class (eql 'fset:seq)) (thing fset:seq) &key &allow-other-keys)
   thing)
 
@@ -81,7 +86,11 @@
 ;;; contains?
 ;;; ---------------------------------------------------------------------
 
-(defun contains? (seq x)(fset:contains? seq x))
+(defmethod contains? ((seq cl:sequence) x &key (test 'eql) &allow-other-keys) 
+  (some (fn (v) ($ test v x)) seq))
+
+(defmethod contains? ((seq fset:seq) x &key (test 'eql) &allow-other-keys)
+  (fset:find x seq :test test))
 
 ;;; ---------------------------------------------------------------------
 ;;; difference
