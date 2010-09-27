@@ -14,13 +14,13 @@
 (defpackage "FOLIO.COLLECTIONS.SEQUENCES"
   (:use :cl :as :fn)
   (:nicknames "SEQ")
-  (:shadow "FIND" "INTERSECTION" "LENGTH" "POSITION" "REDUCE" "REVERSE"
+  (:shadow "FIND" "INTERSECTION" "LAST" "LENGTH" "POSITION" "REDUCE" "REVERSE"
            "SEQUENCE" "SORT" "UNION")
-  (:export "CONCAT" "CONTAINS?" "DIFFERENCE" "DROP" "DROP-WHILE" "ELEMENT" "EMPTY?" "EVERY?" "FILTER"
-           "FIND" "HEAD" "IMAGE" "INTERLEAVE" "INTERPOSE" "INTERSECTION" "LENGTH"
-           "MAKE" "MAKE-AS"
+  (:export "ADD-FIRST" "ADD-LAST" "CHOOSE-ANY" "CONCAT" "CONTAINS?" "DIFFERENCE" "DROP" "DROP-WHILE"
+           "ELEMENT" "EMPTY?" "EVERY?" "FILTER" "FIND" "HEAD" "IMAGE" "INTERLEAVE" "INTERPOSE"
+           "INTERSECTION" "LAST" "LENGTH" "MAKE" "MAKE-AS"
            "PARTITION" "POSITION" "RANGE" "REDUCE" "REPEAT" "REVERSE"
-           "SEQUENCE?" "SLICE" "SOME?" "SORT" "TAIL" "TAKE" "TAKE-WHILE"
+           "SEQUENCE?" "SHUFFLE" "SLICE" "SOME?" "SORT" "TAIL" "TAILS" "TAKE" "TAKE-WHILE"
            "UNION" "UNIQUE" "ZIP"))
 
 (in-package :seq)
@@ -70,6 +70,71 @@
 ;;; =====================================================================
 ;;; sequence API
 ;;; =====================================================================
+
+;;; ---------------------------------------------------------------------
+;;; add-first
+;;; ---------------------------------------------------------------------
+
+(defmethod add-first (x (s null))
+  (list x))
+
+(defmethod add-first (x (s list))
+  (cons x s))
+
+(defmethod add-first (x (s vector))
+  (let ((v (make-array (1+ (length s))
+                       :element-type (array-element-type s))))
+    (setf (aref v 0) x)
+    (loop for i from 1 upto (length s)
+       do (setf (aref v i)(elt s (1- i))))
+    v))
+
+(defmethod add-first ((ch character) (s string))
+  (let ((str (make-string (1+ (length s))
+                          :element-type (array-element-type s))))
+    (setf (aref str 0) ch)
+    (loop for i from 1 upto (length s)
+       do (setf (aref str i)(elt s (1- i))))
+    str))
+
+(defmethod add-first (x (s fset:seq))
+  (fset:with s -1 x))
+
+;;; ---------------------------------------------------------------------
+;;; add-last
+;;; ---------------------------------------------------------------------
+
+(defmethod add-last ((s null) x)
+  (list x))
+
+(defmethod add-last ((s list) x)
+  (append s (list x)))
+
+(defmethod add-last ((s vector) x)
+  (let ((v (make-array (1+ (length s))
+                       :element-type (array-element-type s))))
+    (loop for i from 0 upto (1- (length s))
+       do (setf (aref v i)(elt s i)))
+    (setf (aref v (length s)) x)
+    v))
+
+(defmethod add-last ((s string) (ch character))
+  (let ((str (make-string (1+ (length s))
+                          :element-type (array-element-type s))))
+    (loop for i from 0 upto (1- (length s))
+       do (setf (aref str i)(elt s i)))
+    (setf (aref str (length s)) ch)
+    str))
+
+(defmethod add-last ((s fset:seq) x)
+  (fset:with s (fset:size s) x))
+
+;;; ---------------------------------------------------------------------
+;;; choose-any
+;;; ---------------------------------------------------------------------
+
+(defun choose-any (s)
+  (seq:element s (random (seq:length s))))
 
 ;;; ---------------------------------------------------------------------
 ;;; concat
@@ -205,6 +270,25 @@
                        :test test)))
 
 ;;; ---------------------------------------------------------------------
+;;; last
+;;; ---------------------------------------------------------------------
+
+(defmethod last ((s null))
+  nil)
+
+(defmethod last ((s list))
+  (cl:first (cl:last s)))
+
+(defmethod last ((s vector))
+  (aref s (1- (length s))))
+
+(defmethod last ((s string))
+  (aref s (1- (length s))))
+
+(defmethod last ((s fset:seq))
+  (fset:@ s (1- (fset:size s))))
+
+;;; ---------------------------------------------------------------------
 ;;; length
 ;;; ---------------------------------------------------------------------
 
@@ -283,6 +367,14 @@
 (defmethod sequence? ((s fset:seq)) t)
 
 ;;; ---------------------------------------------------------------------
+;;; shuffle
+;;; ---------------------------------------------------------------------
+
+(defun shuffle (s)
+  (seq:sort (fn (x y)(choose-any (list t nil)))
+        s))
+
+;;; ---------------------------------------------------------------------
 ;;; slice
 ;;; ---------------------------------------------------------------------
 
@@ -312,6 +404,38 @@
   (cdr s))
 
 (defmethod tail ((s fset:seq)) (fset:less-first s))
+
+;;; ---------------------------------------------------------------------
+;;; tails
+;;; ---------------------------------------------------------------------
+
+(defmethod tails ((s list)) 
+  (if (null s)
+      (list nil)
+      (if (null (seq:tail s))
+          (list s nil)
+          (cons s (tails (cdr s))))))
+
+(defmethod tails ((s vector)) 
+  (if (seq:empty? s)
+      (vector #())
+      (if (seq:empty? (seq:tail s))
+          (vector s #())
+          (add-first s (tails (seq:tail s))))))
+
+(defmethod tails ((s string)) 
+  (if (seq:empty? s)
+      (list "")
+      (if (seq:empty? (seq:tail s))
+          (list s "")
+          (add-first s (tails (seq:tail s))))))
+
+(defmethod tails ((s fset:seq)) 
+  (if (seq:empty? s)
+      (fset:seq (fset:empty-seq))
+      (if (seq:empty? (seq:tail s))
+          (fset:seq s (fset:empty-seq))
+          (add-first s (tails (seq:tail s))))))
 
 ;;; ---------------------------------------------------------------------
 ;;; take

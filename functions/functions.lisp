@@ -80,7 +80,7 @@
 
 (defun rotate-left (f)
   (fn (&rest args)
-    (apply f `(,@(cdr args) ,(car args)))))
+    (apply f `(,@(last args) ,@(subseq args 0 (1- (length args)))))))
 
 ;;; ---------------------------------------------------------------------
 ;;; rotate-right
@@ -88,5 +88,4 @@
 
 (defun rotate-right (f)
   (fn (&rest args)
-    (apply f `(,@(last args) ,@(subseq args 0 (1- (length args)))))))
-
+    (apply f `(,@(cdr args) ,(car args)))))

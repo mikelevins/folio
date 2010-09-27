@@ -79,6 +79,20 @@
 (deftestsuite sequence-api-tests (sequence-tests) ())
 
 (addtest (sequence-api-tests)
+  test-add-first
+  (ensure (zerop (seq:head (seq:add-first 0 (seq:make 1 2 3)))))
+  (ensure (eql :foo (seq:head (seq:add-first :foo (vector 1 2 3)))))
+  (ensure (char= #\A (seq:head (seq:add-first #\A "bcdef"))))
+  (ensure (eql 'foo (seq:head (seq:add-first 'foo (fset:seq 'bar 'baz 'grault))))))
+
+(addtest (sequence-api-tests)
+  test-add-last
+  (ensure (zerop (seq:last (seq:add-last (seq:make 1 2 3) 0))))
+  (ensure (eql :foo (seq:last (seq:add-last (vector 1 2 3) :foo))))
+  (ensure (char= #\A (seq:last (seq:add-last "bcdef" #\A))))
+  (ensure (eql 'foo (seq:last (seq:add-last (fset:seq 'bar 'baz 'grault) 'foo)))))
+
+(addtest (sequence-api-tests)
   test-concat
   (let ((l1 (list 0 1 2))
         (l2 (list 3 4 5))
@@ -288,7 +302,31 @@
   (ensure (seq:sequence? "Foo"))
   (ensure (seq:sequence? (seq:make-as 'fset:seq 0 1 2 3))))
 
+(addtest (sequence-api-tests)
+  test-slice
+  (let ((s (seq:make-as 'fset:seq 0 1 2 3 4 5 6 7 8)))
+    (ensure (zerop (seq:head (seq:slice s 0 4))))
+    (ensure (= 3 (seq:last (seq:slice s 0 4))))
+    (ensure (= 2 (seq:head (seq:slice (as 'list s) 2 4))))))
 
+(addtest (sequence-api-tests)
+  test-some?
+  (let ((s0 (seq:make-as 'fset:seq :zero "one" :two '(1 1 1)))
+        (s1 (seq:make-as 'vector 0 "one" 2 3)))
+    (ensure (seq:some? 'numberp s1))
+    (ensure (seq:some? 'equal s0 s1))
+    (ensure (seq:some? (fn (u v)(and (seq:sequence? u)
+                                     (equal v (seq:length u)))) 
+                       s0 s1))
+    (ensure (not (seq:some? 'eq s0 s1)))))
+
+(addtest (sequence-api-tests)
+  test-sort
+  (let ((s0 (vector 8 27 9 2 15 30 174 3))
+        (s1 (vector "aardvark" "bat" "capybara" "dog" "elephant")))
+    (ensure (vectorp (seq:sort '< s0)))
+    (ensure (apply '< (as 'list (seq:sort '< s0))))
+    (ensure (equalp s1 (sort (seq:shuffle s1) 'string<)))))
 
 ;;; (setf *TEST-DESCRIBE-IF-NOT-SUCCESSFUL?* t)
 ;;; (lift:run-tests :suite 'sequence-api-tests)
