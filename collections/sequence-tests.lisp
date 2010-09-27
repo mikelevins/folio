@@ -246,6 +246,52 @@
     (ensure (seq:every? 'numberp (seq:image 'seq:head (seq:partition 1 s :step 2))))
     (ensure (= 2 (seq:length (seq:partition 4 (as 'fset:seq s)))))))
 
+(addtest (sequence-api-tests)
+  test-position
+  (let ((s (list 1 :two 3 :four 5 :six 7 :eight)))
+    (ensure (eql 7  (seq:position (fun:partial 'eql :eight) s)))
+    (ensure (eql 0  (seq:position (fun:partial 'eql 1) s)))
+    (ensure (null  (seq:position (fun:partial 'eql :not-there) s)))))
+
+(addtest (sequence-api-tests)
+  test-range
+  (ensure (eql 10 (seq:length (seq:range 0 10))))
+  (ensure (zerop (seq:length (seq:range 1 1))))
+  (ensure (typep (as 'fset:seq (seq:range 0 10)) 'fset:seq)))
+
+(addtest (sequence-api-tests)
+  test-reduce
+  (let* ((ints (list 1 2 3 4 5))
+         (lists (seq:image 'list ints))
+         (strings (seq:image (fun:partial 'as 'string) ints)))
+    (ensure (eql 15 (seq:reduce '+ ints :initial-value 0)))
+    (ensure (equal ints (seq:reduce 'append lists :initial-value nil)))
+    (ensure (equal "12345" (seq:reduce 'seq:concat strings :initial-value "")))))
+
+(addtest (sequence-api-tests)
+  test-repeat
+  (ensure (eql 10 (seq:length (seq:repeat 10 1))))
+  (ensure (seq:every? (fun:partial '= '47)
+                      (seq:repeat 10 47))))
+
+(addtest (sequence-api-tests)
+  test-reverse
+  (ensure (eql 9 (seq:head (seq:reverse (seq:range 0 10))))))
+
+(addtest (sequence-api-tests)
+  test-sequence?
+  (ensure (seq:sequence? nil))
+  (ensure (seq:sequence? (list 0 1 2 3)))
+  (ensure (seq:sequence? (vector)))
+  (ensure (seq:sequence? (vector 0 1 2 3)))
+  (ensure (seq:sequence? ""))
+  (ensure (seq:sequence? "Foo"))
+  (ensure (seq:sequence? (seq:make-as 'fset:seq 0 1 2 3))))
+
+
 
 ;;; (setf *TEST-DESCRIBE-IF-NOT-SUCCESSFUL?* t)
 ;;; (lift:run-tests :suite 'sequence-api-tests)
+
+
+;;; (lift:run-tests :suite 'sequence-tests)
