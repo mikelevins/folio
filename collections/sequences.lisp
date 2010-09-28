@@ -18,9 +18,9 @@
            "SEQUENCE" "SORT" "UNION")
   (:export "ADD-FIRST" "ADD-LAST" "CHOOSE-ANY" "CONCAT" "CONTAINS?" "DIFFERENCE" "DROP" "DROP-WHILE"
            "ELEMENT" "EMPTY?" "EVERY?" "FILTER" "FIND" "HEAD" "IMAGE" "INTERLEAVE" "INTERPOSE"
-           "INTERSECTION" "LAST" "LENGTH" "MAKE" "MAKE-AS"
+           "INTERSECTION" "JOIN" "LAST" "LENGTH" "MAKE" "MAKE-AS"
            "PARTITION" "POSITION" "RANGE" "REDUCE" "REPEAT" "REVERSE"
-           "SEQUENCE?" "SHUFFLE" "SLICE" "SOME?" "SORT" "TAIL" "TAILS" "TAKE" "TAKE-WHILE"
+           "SEQUENCE?" "SHUFFLE" "SLICE" "SOME?" "SORT" "SPLIT" "TAIL" "TAILS" "TAKE" "TAKE-WHILE"
            "UNION" "UNIQUE" "ZIP"))
 
 (in-package :seq)
@@ -58,11 +58,6 @@
 
 (defmethod as ((class (eql 'fset:seq)) (thing cl:string) &key &allow-other-keys)
   (fset:convert 'fset:seq thing))
-
-(defmethod as ((class (eql 'string)) (thing fset:seq) &key &allow-other-keys)
-  (if (fset::every 'characterp thing)
-      (as 'string (as 'vector thing))
-      (format nil "~S" thing)))
 
 (defmethod as ((class (eql 'fset:seq)) (thing fset:seq) &key &allow-other-keys)
   thing)
@@ -270,6 +265,22 @@
                        :test test)))
 
 ;;; ---------------------------------------------------------------------
+;;; join
+;;; ---------------------------------------------------------------------
+
+(defun join (&rest seqs)
+  (if (seq:empty? seqs)
+      nil
+      (let* ((classname (if (stringp (seq:head seqs))
+                            'list
+                            (classname-for-sequence (seq:head seqs))))
+             (result (as classname (seq:reduce 'seq:concat seqs :initial-value (as classname nil)))))
+        (if (and (stringp (seq:head seqs))
+                 (every? 'characterp result))
+            (as 'string result)
+            result))))
+
+;;; ---------------------------------------------------------------------
 ;;; last
 ;;; ---------------------------------------------------------------------
 
@@ -393,6 +404,33 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod sort (pred s)(fset:stable-sort s pred))
+
+;;; ---------------------------------------------------------------------
+;;; split
+;;; ---------------------------------------------------------------------
+
+(defun split (s sub &key (test 'eql))
+  (let* ((slen (seq:length s))
+         (sublen (seq:length sub))
+         (indexes (seq:range 0 sublen))
+         (reversed-starts nil)
+         (reversed-ends nil))
+    (loop for i from 0 upto (1- slen)
+       do (when (seq:every? (fn (j) ($ test 
+                                       (seq:element s (+ i j))
+                                       (seq:element sub j))) 
+                            indexes)
+            (push i reversed-starts)
+            (push (+ i sublen) reversed-ends)))
+    (let ((result (filter (complement 'seq:empty?) 
+                          (let ((starts (seq:add-first 0 (seq:reverse reversed-ends)))
+                                (ends (seq:add-last (seq:reverse reversed-starts) slen)))
+                            (seq:image (fn (start end)(seq:slice s start end))
+                                       starts ends)))))
+      (if (stringp s)
+          result
+          (as (classname-for-sequence s) result)))))
+
 
 ;;; ---------------------------------------------------------------------
 ;;; tail
