@@ -22,7 +22,7 @@
 
 (defsystem collections
   :serial t
-  :depends-on (:as :fset)
+  :depends-on (:as :fset :functions)
   :components
   ((:file "sets")
    (:file "sequences")

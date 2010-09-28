@@ -26,10 +26,17 @@
   (dolist (s (find-asdf-systems))
     (pushnew s asdf:*central-registry* :test 'equal)))
 
+(defpackage "FOLIO.SYSTEM" (:use :cl :asdf))
+
+(in-package :folio.system)
+
+(defsystem folio
+  :serial t
+  :depends-on (:as :functions :collections))
+
 (in-package :cl-user)
+
 
 (defun load-folio ()
   (init-asdf-registry)
-  (asdf:oos 'asdf:load-op :as)
-  (asdf:oos 'asdf:load-op :functions)
-  (asdf:oos 'asdf:load-op :collections))
+  (asdf:oos 'asdf:load-op :folio))
