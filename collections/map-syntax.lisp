@@ -23,5 +23,5 @@
 (set-macro-character #\{
                 (lambda (stream char)
                   (let ((elts (read-delimited-list #\} stream t)))
-                    `(%plist->alist ',elts))))
+                    `(%plist->alist (list ,@elts)))))
 
