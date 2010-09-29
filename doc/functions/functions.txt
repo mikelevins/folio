@@ -74,7 +74,7 @@ PARTIAL (f &rest args) => new-function
 
   A common use of partial is to create a local function for which some
   inputs are constant. In this relatively common case, you can
-  duynamically compute the unchanging arguments and build them into a
+  dynamically compute the unchanging arguments and build them into a
   function using PARTIAL, and then, for instance, map the resulting
   function over a collection of input values.
 

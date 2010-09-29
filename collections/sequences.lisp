@@ -21,7 +21,7 @@
            "INTERSECTION" "JOIN" "LAST" "LENGTH" "MAKE" "MAKE-AS"
            "PARTITION" "POSITION" "RANGE" "REDUCE" "REPEAT" "REVERSE"
            "SEQUENCE?" "SHUFFLE" "SLICE" "SOME?" "SORT" "SPLIT" "TAIL" "TAILS" "TAKE" "TAKE-WHILE"
-           "UNION" "UNIQUE" "ZIP"))
+           "UNION" "UNIQUE" "UNZIP" "ZIP"))
 
 (in-package :seq)
 

@@ -5,7 +5,7 @@ $ (f &rest args) => vals
   $ is a synonym for FUNCALL whose sole purpose is to make FUNCALLing
   function values more compact and convenient in functional
   code. Recommended use is in expressions where passing functions as
-  values is natural, but where the use of FUNCALL makes the read
+  values is natural, but where the use of FUNCALL makes the code read
   awkwardly, or where it seems unnecessarily verbose. Use $ sparingly.
 
   EXAMPLE: 
