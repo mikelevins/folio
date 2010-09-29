@@ -53,8 +53,6 @@
 ;;; turns out to be useful enough and inefficient enough, we can
 ;;; revisit this design.
 
-(defparameter $ordered-map-size-increment 16)
-
 (defclass ordered-map ()
   ((entries :accessor %map-entries :initform nil :initarg :entries)))
 
