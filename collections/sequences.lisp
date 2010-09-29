@@ -344,8 +344,8 @@
 ;;; range
 ;;; ---------------------------------------------------------------------
 
-(defmethod range (start end)
-  (loop for i from start to (1- end) collect i))
+(defmethod range (start end &key (by 1))
+  (loop for i from start to (- end by) by by collect i))
 
 ;;; ---------------------------------------------------------------------
 ;;; reduce
