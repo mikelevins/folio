@@ -25,6 +25,7 @@
   :depends-on (:as :fset :functions)
   :components
   ((:file "sets")
+   (:file "set-syntax")
    (:file "sequences")
    (:file "sequence-syntax")
    (:file "maps")
