@@ -32,10 +32,9 @@
 
 (defsystem folio
   :serial t
-  :depends-on (:as :functions :collections))
+  :depends-on (:folio.as :folio.functions :folio.collections))
 
 (in-package :cl-user)
-
 
 (defun load-folio ()
   (init-asdf-registry)

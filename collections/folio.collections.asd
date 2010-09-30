@@ -20,9 +20,9 @@
 
 (in-package "FOLIO.COLLECTIONS.SYSTEM")
 
-(defsystem collections
+(defsystem folio.collections
   :serial t
-  :depends-on (:as :fset :functions)
+  :depends-on (:folio.as :fset :folio.functions)
   :components
   ((:file "sets")
    (:file "set-syntax")
@@ -34,4 +34,4 @@
 (in-package :cl-user)
 
 (defun load-collections ()
-  (asdf:oos 'asdf:load-op :collections))
+  (asdf:oos 'asdf:load-op :folio.collections))

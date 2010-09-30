@@ -422,7 +422,7 @@
                             indexes)
             (push i reversed-starts)
             (push (+ i sublen) reversed-ends)))
-    (let ((result (filter (complement 'seq:empty?) 
+    (let ((result (filter (complement #'seq:empty?) 
                           (let ((starts (seq:add-first 0 (seq:reverse reversed-ends)))
                                 (ends (seq:add-last (seq:reverse reversed-starts) slen)))
                             (seq:image (fn (start end)(seq:slice s start end))

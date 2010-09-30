@@ -1,9 +1,9 @@
 ;;;; ***********************************************************************
 ;;;; FILE IDENTIFICATION
 ;;;;
-;;;; Name:          functions.lisp
+;;;; Name:          as.asd
 ;;;; Project:       folio - the Bard runtime
-;;;; Purpose:       combinators
+;;;; Purpose:       general type conversions
 ;;;; Author:        mikel evins
 ;;;; Copyright:     2010 by mikel evins
 ;;;;
@@ -14,20 +14,18 @@
 (require :asdf)
 
 (let ((loadpath *load-truename*))
-  (defun functions-root () (make-pathname :directory (pathname-directory loadpath))))
+  (defun as-root () (make-pathname :directory (pathname-directory loadpath))))
 
-(defpackage "FOLIO.FUNCTIONS.SYSTEM" (:use :cl :asdf))
+(defpackage "FOLIO.AS.SYSTEM" (:use :cl :asdf))
 
-(in-package "FOLIO.FUNCTIONS.SYSTEM")
+(in-package "FOLIO.AS.SYSTEM")
 
-(defsystem functions
+(defsystem folio.as
   :serial t
-  :depends-on ()
   :components
-  ((:file "fn")
-   (:file "functions")))
+  ((:file "as")))
 
 (in-package :cl-user)
 
-(defun load-functions ()
-  (asdf:oos 'asdf:load-op :functions))
+(defun load-as ()
+  (asdf:oos 'asdf:load-op :folio.as))
