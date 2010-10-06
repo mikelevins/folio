@@ -26,5 +26,8 @@
 (defmacro fn (args &body body)
   `(lambda ,args ,@body))
 
+(defmacro ^ (args &body body)
+  `(lambda ,args ,@body))
+
 (defmacro $ (f &rest args)
   `(funcall ,f ,@args))
