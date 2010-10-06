@@ -15,9 +15,9 @@
   (:use :as :cl :fn)
   (:import-from :seq "EMPTY?")
   (:nicknames "MAP")
-  (:shadow "MERGE")
-  (:export "ASSOCIATE" "CONTAINS-KEY?" "DISSOCIATE" "GET-KEY" "KEYS" 
-           "MAKE" "MAKE-AS" "MERGE" "ORDERED-MAP" "VALS" "ZIPMAP"))
+  (:shadow  "GET" "MERGE")
+  (:export "ALIST" "ASSOCIATE" "CONTAINS-KEY?" "DISSOCIATE" "GET" "KEYS" 
+           "MAKE" "MAKE-AS" "MERGE" "ORDERED-MAP" "PLIST" "VALS" "ZIPMAP"))
 
 (in-package :map)
 
@@ -40,18 +40,19 @@
           (acons (car plist) (cadr plist)
                  (%plist->alist (cddr plist))))))
 
+(defun %alist->plist (alist)
+  (seq:interleave (seq:image 'car alist)
+                  (seq:image 'cdr alist)))
+
 ;;; =====================================================================
 ;;; classes
 ;;; =====================================================================
 
-;;; a naive implementation of a map that maintains its keys and values
-;;; in the order that they were added. if an existing key is updated,
-;;; it is moved to the end of the entries in the (newly-created)
-;;; updated object.
+(defclass alist-map-instance ()
+  ((data :reader data :initarg :data)))
 
-;;; for now, this type stores its entries in an alist. if the class
-;;; turns out to be useful enough and inefficient enough, we can
-;;; revisit this design.
+(defclass plist-map-instance ()
+  ((data :reader data :initarg :data)))
 
 (defclass ordered-map ()
   ((entries :accessor %map-entries :initform nil :initarg :entries)))
@@ -63,28 +64,74 @@
 ;;; AS methods
 ;;; =====================================================================
 
+;;; maps, alists, and plists
+
 (defmethod as ((class (eql 'cl:list)) (thing fset:map) &key &allow-other-keys)
-  (fset:convert 'cl:list thing))
+  (error "Use (AS 'map:alist thing) or (AS 'map:plist thing) to convert a map to a list"))
+
+(defmethod as ((class (eql 'cl:list)) (thing ordered-map) &key &allow-other-keys)
+  (error "Use (AS 'map:alist thing) or (AS 'map:plist thing) to convert a map to a list"))
+
+(defmethod as ((class (eql 'fset:map)) (thing cl:list) &key &allow-other-keys)
+  (error "Use (AS 'fset:map (as 'map:alist thing)) or (AS 'fset:map (as 'map:plist thing)) to convert a list to a map"))
+
+(defmethod as ((class (eql 'ordered-map)) (thing cl:list) &key &allow-other-keys)
+  (error "Use (AS 'map:ordered-map (as 'map:alist thing)) or (AS 'map:ordered-map (as 'map:plist thing)) to convert a list to a map"))
+
+(defmethod as ((class (eql 'alist)) (thing fset:map) &key &allow-other-keys)
+  (fset:convert 'list thing))
+
+(defmethod as ((class (eql 'plist)) (thing fset:map) &key &allow-other-keys)
+  (%alist->plist (fset:convert 'list thing)))
+
+(defmethod as ((class (eql 'alist)) (thing ordered-map) &key &allow-other-keys)
+  (%map-entries thing))
+
+(defmethod as ((class (eql 'plist)) (thing ordered-map) &key &allow-other-keys)
+  (%alist->plist (%map-entries thing)))
+
+(defmethod as ((class (eql 'alist)) (thing list) &key &allow-other-keys)
+  (make-instance 'alist-map-instance :data thing))
+
+(defmethod as ((class (eql 'plist)) (thing list) &key &allow-other-keys)
+  (make-instance 'plist-map-instance :data thing))
+
+(defmethod as ((class (eql 'fset:map)) (thing alist-map-instance) &key &allow-other-keys)
+  (fset:convert 'fset:map (data thing)))
+
+(defmethod as ((class (eql 'fset:map)) (thing plist-map-instance) &key &allow-other-keys)
+  (fset:convert 'fset:map (%plist->alist (data thing))))
+
+(defmethod as ((class (eql 'ordered-map)) (thing alist-map-instance) &key &allow-other-keys)
+  (make-instance 'ordered-map :entries (data thing)))
+
+(defmethod as ((class (eql 'ordered-map)) (thing plist-map-instance) &key &allow-other-keys)
+  (make-instance 'ordered-map :entries (%plist->alist (data thing))))
+
+;;; maps as sequences
+
+(defmethod as ((class (eql 'sequence)) (thing fset:map) &key &allow-other-keys)
+  (seq:zip (keys thing)(vals thing)))
+
+(defmethod as ((class (eql 'sequence)) (thing ordered-map) &key &allow-other-keys)
+  (%map-entries thing))
+
+(defmethod as ((class (eql 'sequence)) (thing alist-map-instance) &key &allow-other-keys)
+  (data thing))
+
+(defmethod as ((class (eql 'sequence)) (thing plist-map-instance) &key &allow-other-keys)
+  (%alist->plist (data thing)))
+
+;;; other conversions
 
 (defmethod as ((class (eql 'fset:map)) (thing fset:map) &key &allow-other-keys)
   thing)
-
-(defmethod as ((class (eql 'fset:map)) (thing cl:list) &key &allow-other-keys)
-  (fset:convert 'fset:map thing))
-
-(defmethod as ((class (eql 'cl:list)) (thing ordered-map) &key &allow-other-keys)
-  (copy-tree (%map-entries thing)))
 
 (defmethod as ((class (eql 'fset:map)) (thing ordered-map) &key &allow-other-keys)
   (as 'fset:map (as 'list thing)))
 
 (defmethod as ((class (eql 'ordered-map)) (thing fset:map) &key &allow-other-keys)
   (as 'ordered-map (as 'list thing)))
-
-(defmethod as ((class (eql 'ordered-map)) (thing cl:list) &key &allow-other-keys)
-  (assert (seq:every? 'listp thing)(thing)
-          "AS cannot convert a value to type MAP:ORDERED-MAP: ~S" thing)
-  (make-instance 'ordered-map :entries thing))
 
 (defmethod as ((class (eql 'ordered-map)) (thing ordered-map) &key &allow-other-keys)
   thing)
@@ -97,8 +144,21 @@
 ;;; associate
 ;;; ---------------------------------------------------------------------
 
-(defmethod associate ((m cl:list) key val &key &allow-other-keys)
-  (acons key val m))
+(defmethod associate ((m cl:list) key val &key (test 'eql) &allow-other-keys)
+  (error "Use (AS 'map:alist m) or (AS 'map:plist) to convert lists to maps"))
+
+(defmethod associate ((m alist-map-instance) key val &key (test 'eql) &allow-other-keys)
+  (acons key val
+         (seq:filter (fn (e)(not ($ test key (car e))))
+                     (data m))))
+
+(defmethod associate ((m plist-map-instance) key val &key (test 'eql) &allow-other-keys)
+  (let ((pos (position key (data m) :test test)))
+    (if pos
+        (seq:concat (subseq (data m) 0 pos)
+                    (seq:concat (list key val)
+                                (subseq (data m) (+ pos 2))))
+        (seq:concat (list key val)(data m)))))
 
 (defmethod associate ((m fset:map) key val  &key &allow-other-keys)
   (fset:with m key val))
@@ -116,7 +176,14 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod contains-key? ((m cl:list) key &key (test 'eql) &allow-other-keys)
-  (and (assoc key m :test test)
+  (error "Use (AS 'map:alist m) or (AS 'map:plist) to convert lists to maps"))
+
+(defmethod contains-key? ((m alist-map-instance) key &key (test 'eql) &allow-other-keys)
+  (and (assoc key (data m) :test test)
+       t))
+
+(defmethod contains-key? ((m plist-map-instance) key &key (test 'eql) &allow-other-keys)
+  (and (find key (data m) :test test)
        t))
 
 (defmethod contains-key? ((m fset:map) key &key &allow-other-keys)
@@ -131,9 +198,19 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod dissociate ((m cl:list) key &key (test 'eql) &allow-other-keys)
+  (error "Use (AS 'map:alist m) or (AS 'map:plist) to convert lists to maps"))
+
+(defmethod dissociate ((m alist-map-instance) key &key (test 'eql) &allow-other-keys)
   (remove-if (lambda (entry)
                (funcall test key (car entry))) 
-             m))
+             (data m)))
+
+(defmethod dissociate ((m plist-map-instance) key &key (test 'eql) &allow-other-keys)
+  (let ((pos (position key (data m) :test test)))
+    (if pos
+        (seq:concat (subseq (data m) 0 pos)
+                    (subseq (data m) (+ pos 2)))
+        (data m))))
 
 (defmethod dissociate ((m fset:map) key &key &allow-other-keys)
   (fset:less m key))
@@ -149,6 +226,12 @@
 ;;; empty?
 ;;; ---------------------------------------------------------------------
 
+(defmethod empty? ((m alist-map-instance))
+  (empty? (data m)))
+
+(defmethod empty? ((m plist-map-instance))
+  (empty? (data m)))
+
 (defmethod empty? ((m fset:map))
   (fset:empty? m))
 
@@ -159,18 +242,21 @@
 ;;; get-key
 ;;; ---------------------------------------------------------------------
 
-(defmethod get-key ((m cl:list) key &key (test 'eql) (default nil) &allow-other-keys)
-  (let ((entry (assoc key m :test test)))
+(defmethod get ((m alist-map-instance) key &key (test 'eql) (default nil) &allow-other-keys)
+  (let ((entry (assoc key (data m) :test test)))
     (if entry (cdr entry) default)))
 
-(defmethod get-key ((m fset:map) key &key (default nil) &allow-other-keys)
+(defmethod get ((m plist-map-instance) key &key (default nil) &allow-other-keys)
+  (getf (data m) key default))
+
+(defmethod get ((m fset:map) key &key (default nil) &allow-other-keys)
   (let ((mdefault (fset:map-default m))
         (found (fset:@ m key)))
     (case (fset:compare mdefault found)
       ((:equal) default)
       (t found))))
 
-(defmethod get-key ((m ordered-map) key &key (test 'eql) (default nil) &allow-other-keys)
+(defmethod get ((m ordered-map) key &key (test 'eql) (default nil) &allow-other-keys)
   (let ((entry (%find-entry m key :test test)))
     (if entry (cdr entry) default)))
 
@@ -178,7 +264,10 @@
 ;;; keys
 ;;; ---------------------------------------------------------------------
 
-(defmethod keys ((m cl:list))(seq:image 'car m))
+(defmethod keys ((m alist-map-instance))(seq:image 'car (data m)))
+(defmethod keys ((m plist-map-instance))
+  (seq:image (fn (i)(seq:element (data m) i))
+             (seq:range 0 (length (data m)) :by 2)))
 (defmethod keys ((m fset:map))(fset:domain m))
 (defmethod keys ((m ordered-map))(keys (%map-entries m)))
 
@@ -187,32 +276,33 @@
 ;;; ---------------------------------------------------------------------
 
 (defun make (&rest plist)
-  (if (null plist)
-      nil
-      (acons (car plist) (cadr plist)
-             (apply 'make (cddr plist)))))
+  (as 'fset:map (as 'plist plist)))
 
 (defun make-as (type &rest args)
   (case type
-    ((cl:list) (apply 'make args))
-    ((ordered-map) (make-instance 'ordered-map :entries (apply 'make args)))
-    ((fset:map) (as 'fset:map (apply 'make args)))
+    ((alist) (as 'alist (apply 'make args)))
+    ((plist) (as 'plist (apply 'make args)))
+    ((ordered-map) (make-instance 'ordered-map :entries (as 'alist (apply 'make args))))
+    ((fset:map) (apply 'make args))
     (t (error "Unrecognized map type: ~S" type))))
 
 ;;; ---------------------------------------------------------------------
 ;;; merge
 ;;; ---------------------------------------------------------------------
 
-(defmethod merge ((m1 cl:list) m2 &key (test 'eql) &allow-other-keys)
+(defmethod merge ((m1 alist-map-instance) m2 &key (test 'eql) &allow-other-keys)
   (if (empty? m2)
-      m1
-      (let* ((m2 (as 'list m2))
-             (k (caar m2))
-             (v (cdar m2)))
-        (acons k v
-               (merge (seq:filter (fn (e) (not ($ test k (car e)))) 
-                              m1) 
-                      (cdr m2))))))
+      (data m1)
+      (as 'alist
+          (merge (as 'fset:map m1)
+                 (as 'fset:map m2)))))
+
+(defmethod merge ((m1 plist-map-instance) m2 &key (test 'eql) &allow-other-keys)
+  (if (empty? m2)
+      (data m1)
+      (as 'plist
+          (merge (as 'fset:map m1)
+                 (as 'fset:map m2)))))
 
 (defmethod merge ((m1 fset:map) m2 &key &allow-other-keys)
   (if (empty? m2)
@@ -232,7 +322,10 @@
 ;;; vals
 ;;; ---------------------------------------------------------------------
 
-(defmethod vals ((m cl:list))(seq:image 'cdr m))
+(defmethod vals ((m alist-map-instance))(seq:image 'cdr (data m)))
+(defmethod vals ((m plist-map-instance))
+  (seq:image (fn (i)(seq:element (data m) i))
+             (seq:range 1 (length (data m)) :by 2)))
 (defmethod vals ((m fset:map))(fset:range m))
 (defmethod vals ((m ordered-map))(seq:image 'cdr (%map-entries m)))
 
@@ -241,4 +334,4 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod zipmap ((ks cl:list)(vs cl:list))
-  (seq:image (lambda (k v) (cons k v)) ks vs))
+  (as 'fset:map (as 'alist (seq:image (lambda (k v) (cons k v)) ks vs))))
