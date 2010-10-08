@@ -39,3 +39,5 @@
 (defun load-folio ()
   (init-asdf-registry)
   (asdf:oos 'asdf:load-op :folio))
+
+;;; (load-folio)
