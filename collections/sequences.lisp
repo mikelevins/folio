@@ -20,7 +20,8 @@
            "ELEMENT" "EMPTY?" "EVERY?" "FILTER" "FIND" "HEAD" "IMAGE" "INTERLEAVE" "INTERPOSE"
            "INTERSECTION" "JOIN" "LAST" "LENGTH" "MAKE" "MAKE-AS"
            "PARTITION" "POSITION" "RANGE" "REDUCE" "REPEAT" "REVERSE"
-           "SEQUENCE?" "SHUFFLE" "SLICE" "SOME?" "SORT" "SPLIT" "TAIL" "TAILS" "TAKE" "TAKE-WHILE"
+           "SELECT" "SEQUENCE?" "SHUFFLE" "SLICE" "SOME?" "SORT" "SPLIT" 
+           "TAIL" "TAILS" "TAKE" "TAKE-WHILE"
            "UNION" "UNIQUE" "UNZIP" "ZIP"))
 
 (in-package :seq)
@@ -366,6 +367,17 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod reverse (s)(fset:reverse s))
+
+;;; ---------------------------------------------------------------------
+;;; select
+;;; ---------------------------------------------------------------------
+
+(defmethod select (s (indexes list)) 
+  (as (classname-for-sequence s)
+      (seq:image 'cdr 
+                 (filter (lambda (e) (find (lambda (i)(= i (car e))) indexes))
+                         (zip (range 0 (length s))
+                              s)))))
 
 ;;; ---------------------------------------------------------------------
 ;;; sequence?
