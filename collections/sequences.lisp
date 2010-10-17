@@ -159,9 +159,11 @@
 
 (defmethod difference (s0 s1 &key (test 'eql))
   (as (classname-for-sequence s0)
-   (cl:set-difference (as 'list s0)
-                      (as 'list s1)
-                      :test test)))
+      (let ((result nil))
+        (seq:image (lambda (e) (unless (cl:find e s1 :test test)
+                                 (setf result (cons e result)))) 
+                   s0)
+        (reverse result))))
 
 ;;; ---------------------------------------------------------------------
 ;;; drop
