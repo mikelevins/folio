@@ -22,7 +22,7 @@
            "PARTITION" "POSITION" "RANGE" "REDUCE" "REPEAT" "REVERSE"
            "SELECT" "SEQUENCE?" "SHUFFLE" "SLICE" "SOME?" "SORT" "SPLIT" 
            "TAIL" "TAILS" "TAKE" "TAKE-WHILE"
-           "UNION" "UNIQUE" "UNZIP" "ZIP"))
+           "SUBSEQUENCE" "UNION" "UNIQUE" "UNZIP" "ZIP"))
 
 (in-package :seq)
 
@@ -445,6 +445,15 @@
       (if (stringp s)
           result
           (as (classname-for-sequence s) result)))))
+
+
+;;; ---------------------------------------------------------------------
+;;; subsequence
+;;; ---------------------------------------------------------------------
+
+(defmethod subsequence (s start &optional end) (subseq s start end))
+
+(defmethod subsequence ((s fset:seq) start &optional end) (fset:subseq s start end))
 
 
 ;;; ---------------------------------------------------------------------
