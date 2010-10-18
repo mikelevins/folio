@@ -269,7 +269,7 @@
   (seq:image (fn (i)(seq:element (data m) i))
              (seq:range 0 (length (data m)) :by 2)))
 (defmethod keys ((m fset:map))(fset:domain m))
-(defmethod keys ((m ordered-map))(keys (%map-entries m)))
+(defmethod keys ((m ordered-map))(seq:image #'car (%map-entries m)))
 
 ;;; ---------------------------------------------------------------------
 ;;; make
