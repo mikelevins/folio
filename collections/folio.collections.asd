@@ -29,7 +29,8 @@
    (:file "sequences")
    (:file "sequence-syntax")
    (:file "maps")
-   (:file "map-syntax")))
+   (:file "map-syntax")
+   (:file "maps-as-sequences")))
 
 (in-package :cl-user)
 
