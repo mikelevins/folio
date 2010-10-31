@@ -417,7 +417,7 @@
 ;;; sort
 ;;; ---------------------------------------------------------------------
 
-(defmethod sort (pred s)(fset:stable-sort s (complement pred)))
+(defmethod sort (pred s)(fset:stable-sort s pred))
 
 ;;; ---------------------------------------------------------------------
 ;;; split

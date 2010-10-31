@@ -15,7 +15,7 @@
   (:use :cl :fn)
   (:nicknames "BOX")
   (:shadow "GET")
-  (:export "GET" "MAKE" "PUT"))
+  (:export "BOX" "GET" "MAKE" "PUT"))
 
 (in-package :BOX)
 
