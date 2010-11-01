@@ -16,14 +16,11 @@
 (let ((loadpath *load-truename*))
   (defun folio-root () (make-pathname :directory (pathname-directory loadpath))))
 
-(defun find-asdf-systems ()
-  (let ((sysdefs (directory (merge-pathnames "**/*.asd" (folio-root)))))
-    (map 'list
-         (lambda (s) (make-pathname :directory (pathname-directory s)))
-         sysdefs)))
-
-(defun init-asdf-registry ()
-  (dolist (s (find-asdf-systems))
+(let* ((sysdefs (directory (merge-pathnames "**/*.asd" (folio-root))))
+       (asdf-systems (map 'list
+                          (lambda (s) (make-pathname :directory (pathname-directory s)))
+                          sysdefs)))
+  (dolist (s asdf-systems)
     (pushnew s asdf:*central-registry* :test 'equal)))
 
 (defpackage "FOLIO.SYSTEM" (:use :cl :asdf))
@@ -37,7 +34,6 @@
 (in-package :cl-user)
 
 (defun load-folio ()
-  (init-asdf-registry)
   (asdf:oos 'asdf:load-op :folio))
 
 ;;; (load-folio)
