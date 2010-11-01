@@ -28,5 +28,5 @@
 
 (in-package :cl-user)
 
-(defun load-bxoes ()
+(defun load-boxes ()
   (asdf:oos 'asdf:load-op :folio.boxes))
