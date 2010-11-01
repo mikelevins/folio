@@ -159,11 +159,8 @@
 
 (defmethod difference (s0 s1 &key (test 'eql))
   (as (classname-for-sequence s0)
-      (let ((result nil))
-        (seq:image (lambda (e) (unless (cl:find e s1 :test test)
-                                 (setf result (cons e result)))) 
-                   s0)
-        (reverse result))))
+      (filter (lambda (s)(not (contains? s1 s :test test)))
+              s0)))
 
 ;;; ---------------------------------------------------------------------
 ;;; drop
