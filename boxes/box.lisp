@@ -12,7 +12,7 @@
 (in-package :cl-user)
 
 (defpackage "FOLIO.BOXES"
-  (:use :cl :fn)
+  (:use :cl)
   (:nicknames "BOX")
   (:shadow "GET")
   (:export "BOX" "GET" "MAKE" "PUT"))
