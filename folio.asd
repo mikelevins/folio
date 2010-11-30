@@ -33,7 +33,4 @@
 
 (in-package :cl-user)
 
-(defun load-folio ()
-  (asdf:oos 'asdf:load-op :folio))
-
-;;; (load-folio)
+;;; (asdf:oos 'asdf:load-op :folio)

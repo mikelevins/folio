@@ -99,6 +99,19 @@
 (defmethod as ((class (eql 'fset:map)) (thing alist-map-instance) &key &allow-other-keys)
   (fset:convert 'fset:map (data thing)))
 
+(defmethod as ((class (eql 'plist)) (thing alist-map-instance) &key &allow-other-keys)
+  (let ((result nil))
+    (loop for (k . v) in (data thing)
+         do (progn (push k result)
+                   (push v result)))
+    (reverse result)))
+
+(defmethod as ((class (eql 'alist)) (thing plist-map-instance) &key &allow-other-keys)
+  (let ((result nil))
+    (loop for tl on (data thing) by #'cddr
+       do (push (cons (car tl)(cadr tl)) result))
+    (reverse result)))
+
 (defmethod as ((class (eql 'fset:map)) (thing plist-map-instance) &key &allow-other-keys)
   (fset:convert 'fset:map (%plist->alist (data thing))))
 

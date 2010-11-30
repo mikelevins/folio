@@ -1,0 +1,175 @@
+folio
+the Bard Runtime Library
+
+  * Introduction
+  * Loading
+  * AS
+  * Boxes
+  * Functions
+  * Collections
+
+Introduction
+------------
+
+folio is a set of modules that make some functional programming idioms
+more convenient for use in Common Lisp. The folio modules are portions
+of the runtime from the new Lisp dialect Bard, packaged for convenient
+use as Common Lisp libraries. As Bard's runtime matures, additional
+portions may be added as folio modules.
+
+Loading
+-------
+
+folio assumes that it's being used with Zach Beane's Quicklisp. To
+load folio, after Quicklisp is installed, eval the following
+expression:
+
+  (ql:quickload "folio")
+
+folio also relies on Scott L. Burson's FSet library, which is also
+distributed by Quicklisp. Loading folio should also load FSet
+automatically. If for any reason you should need to load FSet
+manually, eval the expression:
+
+  (ql:quickload "fset")
+
+AS
+--
+
+The AS module provides a single generic function designed as a
+convenient, extensible utility for converting from one type to
+another. Following are a few examples of AS in use:
+
+CL-USER> (as 'list #(0 1 2 3 4))
+(0 1 2 3 4)
+
+CL-USER> (as 'string '(#\H #\e #\l #\l #\o))
+"Hello"
+
+The AS package exports a single name, "AS", in order to make it easy
+to use the package. AS names a generic function of two arguments; the
+first argment is the name of a target type; the second argument is a
+value to be converted.
+
+Type names are conventionally the names of Common Lisp classes, but
+don't have to be. You can use EQL specializers to name conversions,
+and the target type names don't necessarily have to be the names of
+CLOS classes. For example, folio provides methods for converting from
+FSet's MAP type to both alists and plists:
+
+CL-USER> (setq $fmap (fset:map (:a 1) (:b 2) (:c 3)))
+#{| (:A 1) (:B 2) (:C 3) |}
+
+CL-USER> (as 'map:alist $fmap)
+((:A . 1) (:B . 2) (:C . 3))
+
+CL-USER> (as 'map:plist $fmap)
+(:A 1 :B 2 :C 3)
+
+Neither ALIST nor PLIST is the name of a CLOS class. Rather, each is
+the name of different a way of interpreting an instance of LIST as a
+map. folio specializes AS on each name to provide a method for
+converting to that use of lists.
+
+Boxes
+-----
+
+Boxes are very simple objects that contain references to other
+values. A box is a settable wrapper around a value. The primary
+utility of a box is to provide a settable place in a functional data
+structure.
+
+For example, FSet's weight-balanced trees provide very efficient
+functional representations of searchable data structures like
+sequences and maps. They provide a good balance of efficiency in
+search, insertion, deletion, subsets, concatenation, and so on.
+
+FSet's data structures are functional, which means that you normally
+can't destructively modify them. This is mostly an advantage, but
+there are some circumstances in which you may want to take advantage
+of FSet's strengths, and still be able to destructively update a value
+at a particular spot in a data structure. For such uses, boxes are
+handy.
+
+CL-USER> (setf $box (box:make nil))
+#<FOLIO.BOXES:BOX 200C295F>
+
+CL-USER> (box:get $box)
+NIL
+
+CL-USER> (box:put 1001 $box)
+1001
+
+CL-USER> (box:get $box)
+1001
+
+Although there is presently no provision for thread-safe update of
+boxes, it's my intention to implement a mechanism to provide atomic
+updates of boxes at some point in the future.
+
+Functions
+---------
+
+Folio provides a small set of function-handling utilities, in order to
+make some functional idioms more convenient.
+
+The FUN package exports a small set of functions that accept
+functions as inputs and return functions as outputs. Such functions
+are known, in the parlance of functional programming, as
+"combinators".
+
+The purpose of combinators is to arrange existing functions into more
+convenient forms. For example, you could conveniently create a
+sequence of folio boxes like this:
+
+  (mapcar (fun:partial #'make-instance 'box:box :value)
+          '(0 1 2 3 4 5))
+
+PARTIAL constructs a function from MAKE-INSTANCE; the constructed
+function has already accepted the arguments 'BOX:BOX and :VALUE. When
+applied to each of the numbers in the argument list, it applies
+MAKE-INSTANCE to BOX, :VALUE and that number:
+
+The FN package exports three macros that are simply abbreviations for
+Common Lisp forms whose names are little bukly if you're writing a lot
+of functional code.
+
+  FN is an abbreviation for LAMBDA
+
+  ^ is also an abbreviation for LAMBDA
+
+  $ is an abbreviation for FUNCALL
+
+The names were not chosen completely arbitrarily: FN is the name used
+for LAMBDA in Clojure; ^ is the name for LAMBDA originally proposed by
+Haskell Curry, and replaced by LAMBDA because of a typographical
+accident; $ is the name that Haskell uses for APPLY.
+
+The intention is not to replace all uses of LAMBDA and FUNCALL, but
+when writing functional code, with many references to anonymous
+functions, the numerous repetitions of LAMBDA and FUNCALL can make
+expressions bulky and reduce their readability. The purpose of the
+macros in the FN package is to provide a way to reduce that clutter
+and improve readability in functional code. Use them when they make
+code easier to read; avoid them when they don't.
+
+Collections
+-----------
+
+The folio Collections module provides a common API for sets,
+sequences, and maps that works across Common Lisp's lists, vectors,
+and strings, and also across FSet's sets, sequences, and maps. Its
+goal is to provide an API for these collections that is the same
+regardless of which representation you choose.
+
+The folio Collections module extends AS to convert among various
+representations of sets, sequences, and maps. It also provides
+optional literal syntax for sequences and maps, which can be
+convenient for using them in some code.
+
+The number of possible conversions and uses is large; it seems I'm
+always finding new combinations that are useful. Over time, it's
+reasonable to expect that folio's collections will include more and
+more conversion methods and utilities for specifying representations
+of sets, sequences, and maps.
+

@@ -14,7 +14,7 @@
 (defpackage "FOLIO.FN"
   (:use :cl)
   (:nicknames "FN")
-  (:export "$" "FN"))
+  (:export "$" "^" "FN"))
 
 (in-package :FN)
 
