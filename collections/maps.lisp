@@ -16,8 +16,8 @@
   (:import-from :seq "EMPTY?")
   (:nicknames "MAP")
   (:shadow  "GET" "MERGE")
-  (:export "ALIST" "ASSOCIATE" "CONTAINS-KEY?" "DISSOCIATE" "GET" "KEYS" 
-           "MAKE" "MAKE-AS" "MERGE" "ORDERED-MAP" "PLIST" "VALS" "ZIPMAP"))
+  (:export "ALIST" "ALIST->PLIST" "ASSOCIATE" "CONTAINS-KEY?" "DISSOCIATE" "GET" "KEYS" 
+           "MAKE" "MAKE-AS" "MERGE" "ORDERED-MAP" "PLIST" "PLIST->ALIST" "VALS" "ZIPMAP"))
 
 (in-package :map)
 
@@ -32,15 +32,15 @@
 ;;; private utils
 ;;; =====================================================================
 
-(defun %plist->alist (plist)
+(defun plist->alist (plist)
   (if (null plist)
       nil
       (if (null (cdr plist))
           (error "Malformed key/value list in ~S" plist)
           (acons (car plist) (cadr plist)
-                 (%plist->alist (cddr plist))))))
+                 (plist->alist (cddr plist))))))
 
-(defun %alist->plist (alist)
+(defun alist->plist (alist)
   (seq:interleave (seq:image 'car alist)
                   (seq:image 'cdr alist)))
 
@@ -82,13 +82,13 @@
   (fset:convert 'list thing))
 
 (defmethod as ((class (eql 'plist)) (thing fset:map) &key &allow-other-keys)
-  (%alist->plist (fset:convert 'list thing)))
+  (alist->plist (fset:convert 'list thing)))
 
 (defmethod as ((class (eql 'alist)) (thing ordered-map) &key &allow-other-keys)
   (%map-entries thing))
 
 (defmethod as ((class (eql 'plist)) (thing ordered-map) &key &allow-other-keys)
-  (%alist->plist (%map-entries thing)))
+  (alist->plist (%map-entries thing)))
 
 (defmethod as ((class (eql 'alist)) (thing list) &key &allow-other-keys)
   (make-instance 'alist-map-instance :data thing))
@@ -113,13 +113,13 @@
     (reverse result)))
 
 (defmethod as ((class (eql 'fset:map)) (thing plist-map-instance) &key &allow-other-keys)
-  (fset:convert 'fset:map (%plist->alist (data thing))))
+  (fset:convert 'fset:map (plist->alist (data thing))))
 
 (defmethod as ((class (eql 'ordered-map)) (thing alist-map-instance) &key &allow-other-keys)
   (make-instance 'ordered-map :entries (data thing)))
 
 (defmethod as ((class (eql 'ordered-map)) (thing plist-map-instance) &key &allow-other-keys)
-  (make-instance 'ordered-map :entries (%plist->alist (data thing))))
+  (make-instance 'ordered-map :entries (plist->alist (data thing))))
 
 ;;; maps as sequences
 
@@ -133,7 +133,7 @@
   (data thing))
 
 (defmethod as ((class (eql 'sequence)) (thing plist-map-instance) &key &allow-other-keys)
-  (%alist->plist (data thing)))
+  (alist->plist (data thing)))
 
 ;;; other conversions
 
@@ -158,7 +158,7 @@
 ;;; ---------------------------------------------------------------------
 
 (defun alist (&rest plist)
-  (%plist->alist plist))
+  (plist->alist plist))
 
 ;;; ---------------------------------------------------------------------
 ;;; associate
