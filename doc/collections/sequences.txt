@@ -34,8 +34,8 @@ CHOOSE-ANY (s) => val
 CONCAT (&rest sequences) => new-sequence
   function
 
-  CONCAT returns a new sequence whose elements are the elements of S1
-  followed by the elements of S2. The type of the result sequence is
+  CONCAT returns a new sequence constructed by concatenating the input
+  sequences in order. The type of the result sequence is
   the same as the type of the first argument sequence.
 
 
