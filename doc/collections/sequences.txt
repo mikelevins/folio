@@ -31,12 +31,12 @@ CHOOSE-ANY (s) => val
 
   CHOOSE-ANY returns a randomly-chosen element of S.
 
-CONCAT (s1 s2) => new-s
-  generic function
+CONCAT (&rest sequences) => new-sequence
+  function
 
-  CONCAT returns a new sequence of the same class as (or a superclass
-  of) S1, whose elements are the elements of S1 followed by the
-  elements of S2.
+  CONCAT returns a new sequence whose elements are the elements of S1
+  followed by the elements of S2. The type of the result sequence is
+  the same as the type of the first argument sequence.
 
 
 CONTAINS? (s1 x &key (test 'eql)) => boolean

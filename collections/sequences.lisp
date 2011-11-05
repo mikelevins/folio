@@ -136,12 +136,20 @@
 ;;; concat
 ;;; ---------------------------------------------------------------------
 
-(defmethod concat (s0 s1)
+(defmethod %concat (s0 s1)
   (concatenate (classname-for-sequence s0)
                s0 (as (classname-for-sequence s0) s1)))
 
-(defmethod concat ((s0 fset:seq) s1)
+(defmethod %concat ((s0 fset:seq) s1)
   (fset:concat s0 (as 'fset:seq s1)))
+
+(defun concat (&rest sequences)
+  (if (null sequences)
+      nil
+      (if (null (cdr sequences))
+          (car sequences)
+          (reduce #'%concat (cddr sequences) :initial-value (%concat (car sequences)
+                                                                     (cadr sequences))))))
 
 ;;; ---------------------------------------------------------------------
 ;;; contains?
