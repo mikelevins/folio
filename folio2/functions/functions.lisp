@@ -19,12 +19,28 @@
 ;;; (f1 (f2 (...(fk args)))). All arguments f1..fk must accept and return 
 ;;; the same number of values
 
+(defun compose (f &rest fs)
+  (if (null fs)
+      f
+      (if (null (cdr fs))
+          (lambda (x) (funcall f (funcall (car fs) x)))
+          (lambda (x) (funcall f (funcall (apply 'compose fs) x))))))
+
 ;;; function conjoin
 ;;;
 ;;; (conjoin p1 p2 ... pk) => fn
 ;;; ---------------------------------------------------------------------
 ;;; returns a function whose effect is the same as that of applying
 ;;; (and (p1 arg)(p2 arg)...(pk arg))
+
+(defun conjoin (&rest preds)
+  (lambda (&rest args)
+    (let ((val nil))
+      (some (lambda (p) 
+              (setf val (apply p args))
+              (not val))
+            preds)
+      val)))
 
 ;;; function disjoin
 ;;;
@@ -33,6 +49,15 @@
 ;;; returns a function whose effect is the same as that of applying
 ;;; (or (p1 arg)(p2 arg)...(pk arg))
 
+(defun disjoin (&rest preds)
+  (lambda (&rest args)
+    (let ((val nil))
+      (some (lambda (p) 
+              (setf val (apply p args))
+              val)
+            preds)
+      val)))
+
 ;;; function flip
 ;;;
 ;;; (flip f1) => f2
@@ -40,6 +65,8 @@
 ;;; given an argument f1 of the form (lambda (a b)...), returns a
 ;;; function of the form (lambda (b a) ...). Except for the order of the
 ;;; arguments a and b, the new function is identical to the old.
+
+(defun flip (f) (lambda (x y) (funcall f y x)))
 
 ;;; function partial
 ;;;
@@ -52,6 +79,10 @@
 ;;; two arguments. Evaluating (f2 2 3) binds c and d to 2 and 3,
 ;;; respectively, then computes the same result as if we had
 ;;; originally called (f1 0 1 2 3).
+
+(defun partial (f &rest args)
+  (lambda (&rest more-args)
+    (apply f `(,@args ,@more-args))))
 
 
 ;;; function rpartial
@@ -66,5 +97,9 @@
 ;;; respectively, then computes the same result as if we had
 ;;; originally called (f1 0 1 2 3).
 
+
+(defun rpartial (f &rest args)
+  (lambda (&rest more-args)
+    (apply f `(,@more-args ,@args))))
 
 
