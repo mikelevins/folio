@@ -20,6 +20,30 @@
 ;;; FUNCALL. If f is a sequence, table, series, or generator, then
 ;;; it is a synonym for net.bardcode.folio.tables:GET-KEY
 
+(defmethod %funcall-applicable (f &rest args)
+  (error "Not an applicable object: ~S" f))
+
+(defmethod %funcall-applicable ((f symbol) &rest args)
+  (apply f args))
+
+(defmethod %funcall-applicable ((f function) &rest args)
+  (apply f args))
+
+(defmethod %funcall-applicable ((f sequence) &rest args)
+  (net.bardcode.folio.tables:get-key f (car args)))
+
+(defmethod %funcall-applicable ((f fset:seq) &rest args)
+  (net.bardcode.folio.tables:get-key f (car args)))
+
+(defmethod %funcall-applicable ((f fset:map) &rest args)
+  (net.bardcode.folio.tables:get-key f (car args)))
+
+(defmethod %funcall-applicable ((f series::foundation-series) &rest args)
+  (net.bardcode.folio.tables:get-key f (car args)))
+
+(defmacro $ (f &rest args)
+  `(%funcall-applicable ,f ,@args))
+
 ;;; macro ^
 ;;; 
 ;;; (^ (arg1..argk) expr1..exprk) => a function
@@ -27,6 +51,9 @@
 ;;; A more compact synonym for LAMBDA. This macro is not intended as
 ;;; a replacement for LAMBDA, but as a convenience for cases in
 ;;; which the clarity of functional code benefits from compactness.
+
+(defmacro ^ (args &body body)
+  `(lambda ,args ,@body))
 
 ;;; macro ->
 ;;;
@@ -45,4 +72,13 @@
 ;;; machine can conveniently be represented as a tuple of registers
 ;;; and a set of operations that change their values.
 
+
+(defmacro -> (args &body body)
+  (if (null body)
+      `(values ,@args)
+      (let ((vars (loop for arg in args collect (gensym)))
+            (f (car body))
+            (more (cdr body)))
+        `(multiple-value-bind ,vars (funcall ,f ,@args)
+           (-> ,vars ,@more)))))
 
