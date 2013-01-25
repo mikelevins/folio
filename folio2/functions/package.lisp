@@ -10,20 +10,17 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(defpackage #:net.bardcode.folio.applying
+(defpackage #:net.bardcode.folio.functions
   (:use #:cl)
   (:export
    #:$
    #:^
    #:->
-   #:fn
    #:compose
    #:conjoin
    #:disjoin
    #:flip
    #:partial
-   #:rotate-left
-   #:rotate-right
-   #:section))
+   #:rpartial))
 
 

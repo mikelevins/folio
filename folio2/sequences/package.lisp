@@ -9,7 +9,7 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(defpackage #:net.bardcode.folio.listing
+(defpackage #:net.bardcode.folio.sequences
   (:use #:cl)
   (:export
    #:add-first

@@ -1,22 +1,16 @@
 ;;;; ***********************************************************************
 ;;;; FILE IDENTIFICATION
 ;;;;
-;;;; Name:          package.lisp
+;;;; Name:          syntax.lisp
 ;;;; Project:       folio - the Bard runtime
-;;;; Purpose:       wrapping values in mutable containers
+;;;; Purpose:       syntactic sugar for boxes
 ;;;; Author:        mikel evins
 ;;;; Copyright:     2013 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
-(defpackage #:net.bardcode.folio.boxing
-  (:use #:cl)
-  (:export
-   #:@
-   #:box
-   #:box?
-   #:set-box!
-   #:unbox))
+(in-package #:net.bardcode.folio.boxes)
+
 
 
 

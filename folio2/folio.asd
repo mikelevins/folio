@@ -13,23 +13,24 @@
 
 (require :asdf)
 
-(asdf:defsystem :net.bardcode.folio.applying
+(asdf:defsystem :net.bardcode.folio.functions
   :serial t
   :description "combinators and other conveniences for working with functions"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:fset :series)
-  :components ((:module "applying"
+  :components ((:module "functions"
                         :serial t
-                        :components ((:file "package")))))
+                        :components ((:file "package")
+                                     (:file "syntax")))))
 
-(asdf:defsystem :net.bardcode.folio.boxing
+(asdf:defsystem :net.bardcode.folio.boxes
   :serial t
   :description "wrapping values in mutable containers"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:fset :series)
-  :components ((:module "boxing"
+  :components ((:module "boxes"
                         :serial t
                         :components ((:file "package")))))
 
@@ -38,8 +39,8 @@
   :description "syntactic sugar for boxes"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset :series :net.bardcode.folio.boxing)
-  :components ((:module "boxing"
+  :depends-on (:fset :series :net.bardcode.folio.boxes)
+  :components ((:module "boxes"
                         :serial t
                         :components ((:file "package")
                                      (:file "syntax")))))
@@ -64,36 +65,38 @@
                         :serial t
                         :components ((:file "package")))))
 
-(asdf:defsystem :net.bardcode.folio.listing
+(asdf:defsystem :net.bardcode.folio.sequences
   :serial t
   :description "tools for manipulating sequences, series, and generators"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:fset :series)
-  :components ((:module "listing"
+  :components ((:module "sequences"
                         :serial t
-                        :components ((:file "package")))))
+                        :components ((:file "package")
+                                     (:file "functions")))))
 
 (asdf:defsystem :net.bardcode.folio.sequence-syntax
   :serial t
   :description "syntacitc sugar for sequences"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset :series :net.bardcode.folio.listing)
-  :components ((:module "listing"
+  :depends-on (:fset :series :net.bardcode.folio.sequences)
+  :components ((:module "sequences"
                         :serial t
                         :components ((:file "package")
                                      (:file "syntax")))))
 
-(asdf:defsystem :net.bardcode.folio.mapping
+(asdf:defsystem :net.bardcode.folio.tables
   :serial t
   :description "tools for manipulating finite maps"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:fset :series)
-  :components ((:module "mapping"
+  :components ((:module "tables"
                         :serial t
-                        :components ((:file "package")))))
+                        :components ((:file "package")
+                                     (:file "functions")))))
 
 (asdf:defsystem :net.bardcode.folio.table-syntax
   :serial t
@@ -101,7 +104,7 @@
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:fset :series)
-  :components ((:module "mapping"
+  :components ((:module "tables"
                         :serial t
                         :components ((:file "package")
                                      (:file "syntax")))))
@@ -163,14 +166,14 @@
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:fset :series
-                     :net.bardcode.folio.applying
-                     :net.bardcode.folio.boxing 
+                     :net.bardcode.folio.functions
+                     :net.bardcode.folio.boxes 
                      :net.bardcode.folio.box-syntax
                      :net.bardcode.folio.constructing
                      :net.bardcode.folio.converting
-                     :net.bardcode.folio.listing
+                     :net.bardcode.folio.sequences
                      :net.bardcode.folio.sequence-syntax
-                     :net.bardcode.folio.mapping
+                     :net.bardcode.folio.tables
                      :net.bardcode.folio.table-syntax
                      :net.bardcode.folio.ordering
                      :net.bardcode.folio.pairing

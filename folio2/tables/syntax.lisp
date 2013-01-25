@@ -9,7 +9,7 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package #:net.bardcode.folio.mapping)
+(in-package #:net.bardcode.folio.tables)
 
 
 

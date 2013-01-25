@@ -1,15 +1,25 @@
 ;;;; ***********************************************************************
 ;;;; FILE IDENTIFICATION
 ;;;;
-;;;; Name:          syntax.lisp
+;;;; Name:          package.lisp
 ;;;; Project:       folio - the Bard runtime
-;;;; Purpose:       syntactic sugar for sequences
+;;;; Purpose:       tools for manipulating finite maps
 ;;;; Author:        mikel evins
 ;;;; Copyright:     2013 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package #:net.bardcode.folio.listing)
+(defpackage #:net.bardcode.folio.tables
+  (:use #:cl)
+  (:export
+   #:contains-key?
+   #:contains-value?
+   #:get-key
+   #:keys
+   #:merge-maps
+   #:put-key
+   #:table
+   #:vals))
 
 
 

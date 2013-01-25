@@ -3,24 +3,20 @@
 ;;;;
 ;;;; Name:          package.lisp
 ;;;; Project:       folio - the Bard runtime
-;;;; Purpose:       tools for manipulating finite maps
+;;;; Purpose:       wrapping values in mutable containers
 ;;;; Author:        mikel evins
 ;;;; Copyright:     2013 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
-(defpackage #:net.bardcode.folio.mapping
+(defpackage #:net.bardcode.folio.boxes
   (:use #:cl)
   (:export
-   #:contains-key?
-   #:contains-value?
-   #:get-key
-   #:keys
-   #:merge
-   #:put-key
-   #:table
-   #:vals))
-
+   #:@
+   #:box
+   #:box?
+   #:set-box!
+   #:unbox))
 
 
 
