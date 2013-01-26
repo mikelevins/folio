@@ -19,7 +19,7 @@
         :net.bardcode.folio.sequences
         :net.bardcode.folio.tables
         :net.bardcode.folio.ordering
-        :net.bardcode.folio.pairing
+        :net.bardcode.folio.pairs
         :net.bardcode.folio.sets
         :net.bardcode.folio.text)
   (:export

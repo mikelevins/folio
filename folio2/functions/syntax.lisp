@@ -55,23 +55,14 @@
 (defmacro ^ (args &body body)
   `(lambda ,args ,@body))
 
-;;; macro ->
+;;; macro cascade
 ;;;
-;;; (-> (arg1..argk) f1..fn) => val1..valk
+;;; (cascade (arg1..argk) f1..fn) => val1..valk
 ;;; ---------------------------------------------------------------------
-;;; pronounced "flow", -> is a convenience for writing programs in
-;;; which a set of data values flows through a series of
-;;; transformations. Each function f1..fn must accept and return k
-;;; values, and the flow form returns k values. The inputs to f1 are
-;;; the values arg1..argk; the inputs to f2 are the k values returned
-;;; by f1; the inputs to f3 are the k values returned by f2, and so
-;;; on. The flow operator greatly simplifies code in which a tuple of
-;;; values undergoes a series of transformations that changes the 
-;;; values, but not the size of the tuple. Many processes can be
-;;; conveniently represented this way; for example, a virtual 
-;;; machine can conveniently be represented as a tuple of registers
-;;; and a set of operations that change their values.
-
+;;; F1 through FN are all functions that accept K arguments and return
+;;; K values. cascade applies F1 to arguments arg1..argk. The K
+;;; output values become the inputs to F2. F2's outputs are the inputs
+;;; to F3, and so on. The outputs of FN are VAL1..VALK
 
 (defmacro -> (args &body body)
   (if (null body)
@@ -82,3 +73,13 @@
         `(multiple-value-bind ,vars (funcall ,f ,@args)
            (-> ,vars ,@more)))))
 
+
+;;; function ->
+;;;
+;;; (-> f1..fk) => fx
+;;; ---------------------------------------------------------------------
+;;; returns a function FX that accepts k arguments. When applied to k
+;;; values, the function yield k values, applying F1 to the first argument,
+;;; F2 to the second, and so on. Combines usefully with cascade, e.g:
+;;; (cascade (a b c) (-> f1 f2 f3)(-> f4 f5 f6)(f7 f8 f9)) => v1 v2 v3
+;;; wgere v1 is (f7 (f4 (f1 a))), and so on for the other values.

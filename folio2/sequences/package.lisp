@@ -15,26 +15,48 @@
    #:add-first
    #:add-last
    #:any
-   #:by
+   #:append
+   #:coalesce
    #:drop
+   #:drop-while
    #:element
    #:empty?
+   #:every?
    #:filter
    #:first
    #:generate
+   #:interleave
+   #:interpose
+   #:join
    #:last
    #:length
    #:map
    #:next-last
    #:partition
+   #:position
+   #:range
+   #:range-from
    #:reduce
+   #:repeat
    #:rest
    #:reverse
    #:scan
    #:second
+   #:select
+   #:sequence?
+   #:shuffle
+   #:slice
    #:some?
+   #:sort
+   #:split
+   #:subsequence
+   #:tails
    #:take
-   #:take-by))
+   #:take-by
+   #:take-while
+   #:unique
+   #:unzip
+   #:zip))
 
 
 
