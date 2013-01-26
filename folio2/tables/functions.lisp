@@ -36,11 +36,7 @@
   (fset:domain-contains? map key))
 
 (defmethod contains-key? ((map series::foundation-series) (key integer) &key &allow-other-keys)
-  (let* ((absent (gensym))
-         (found (series:collect-nth key map absent)))
-    (if (eq found absent)
-        nil
-        t)))
+  (series:collect-nth key (keys map)))
 
 ;;; generic function contains-value?
 ;;;
@@ -62,12 +58,7 @@
   (fset:range-contains? map key))
 
 (defmethod contains-value? ((map series::foundation-series) val &key (test #'equal) &allow-other-keys)
-  (let* ((absent (gensym))
-         (found-items (series:choose-if #'(lambda (x)(funcall test val x)) map))
-         (found (series:collect-first found-items absent)))
-    (if (eq found absent)
-        nil
-        t)))
+  (series:collect-first (series:choose-if (lambda (x)(funcall test val x)) map)))
 
 ;;; generic function get-key
 ;;; (get-key map key &key (test 'equal)(default nil)) => anything
@@ -91,7 +82,7 @@
     (if found? result default)))
 
 (defmethod get-key ((map series::foundation-series) (key integer) &key (default nil) &allow-other-keys)
-  (series:collect-nth key map default))
+  #|(series:collect-nth key map default)|#)
 
 ;;; generic function keys
 ;;; (keys map) => a list of keys
@@ -137,18 +128,21 @@
   (fset:map-union map1 map2))
 
 (defmethod merge-maps ((map1 series::foundation-series)(map2 series::foundation-series) &key &allow-other-keys)
-  (let* ((pos1 (series:mask (keys map1)))
-         (pos2 (series:mask (keys map2))))
-    (series:until-if #'null
-                     (series:map-fn 't (lambda (m2 p2 m1 p1)
-                                         (cond 
-                                           (p2 m2)
-                                           (p1 m1)
-                                           (t nil)))
-                                    (series:catenate map2 (net.bardcode.folio.sequences::cycle '(nil)))
-                                    pos2
-                                    (series:catenate map1 (net.bardcode.folio.sequences::cycle '(nil)))
-                                    pos1))))
+  (labels ((nils () 
+             (series:scan-fn 't 
+                             (lambda () nil)
+                             (lambda (i)(declare (ignore i)) nil))))
+    (let* ((pos1 (series:mask (keys map1)))
+           (pos2 (series:mask (keys map2)))
+           (map1 (series:catenate map1 (nils)))
+           (map2 (series:catenate map2 (nils))))
+      (series:until-if #'null
+                       (series:map-fn 't (lambda (m2 p2 m1 p1)
+                                           (cond 
+                                             (p2 m2)
+                                             (p1 m1)
+                                             (t nil)))
+                                      map2 pos2 map1 pos1)))))
 
 ;;; generic function put-key
 ;;; (put-key map1 key val (test 'equal)) => map2

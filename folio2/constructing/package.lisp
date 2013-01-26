@@ -9,10 +9,10 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(defpackage #:net.bardcode.folio.constructing
-  (:use #:cl)
+(defpackage :net.bardcode.folio.constructing
+  (:use :cl)
   (:export
-   #:make))
+   :make))
 
 
 

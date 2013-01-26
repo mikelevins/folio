@@ -9,7 +9,7 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(defpackage #:net.bardcode.folio.pairing
+(defpackage #:net.bardcode.folio.pairs
   (:use #:cl)
   (:export
    #:left

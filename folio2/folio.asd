@@ -119,13 +119,13 @@
                         :serial t
                         :components ((:file "package")))))
 
-(asdf:defsystem :net.bardcode.folio.pairing
+(asdf:defsystem :net.bardcode.folio.pairs
   :serial t
   :description "associating one value with another"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:fset :series)
-  :components ((:module "pairing"
+  :components ((:module "pairs"
                         :serial t
                         :components ((:file "package")))))
 
@@ -176,12 +176,15 @@
                      :net.bardcode.folio.tables
                      :net.bardcode.folio.table-syntax
                      :net.bardcode.folio.ordering
-                     :net.bardcode.folio.pairing
+                     :net.bardcode.folio.pairs
                      :net.bardcode.folio.sets
                      :net.bardcode.folio.set-syntax
-                     :net.bardcode.folio.text))
+                     :net.bardcode.folio.text)
+  :components ((:file "package")))
 
 (defun load-folio ()
-  (asdf:oos 'asdf:load-op :net.bardcode.folio))
+  (let ((asdf:*compile-file-warnings-behaviour* #+sbcl :ignore #-sbcl :warn)
+        (asdf:*compile-file-failure-behaviour* #+sbcl :ignore #-sbcl :warn))
+    (asdf:oos 'asdf:load-op :net.bardcode.folio)))
 
 ;;; (load-folio)
