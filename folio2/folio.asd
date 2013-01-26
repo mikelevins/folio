@@ -22,6 +22,7 @@
   :components ((:module "functions"
                         :serial t
                         :components ((:file "package")
+                                     (:file "functions")
                                      (:file "syntax")))))
 
 (asdf:defsystem :net.bardcode.folio.boxes
