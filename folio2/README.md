@@ -4,7 +4,7 @@
 
 folio is a collection of utilities intended to make it more convenient
 to program in a functional style in Common Lisp. Common Lisp is a
-multi-paradigm language in which many style of programming are
+multi-paradigm language in which many styles of programming are
 possible, but none is made especially convenient at the expense of
 others. folio is a set of enhancements that make functional idioms a
 little more convenient.
