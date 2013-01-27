@@ -16,7 +16,7 @@
    #:contains-value?
    #:get-key
    #:keys
-   #:merge-maps
+   #:merge-tables
    #:put-key
    #:table
    #:vals))

@@ -9,12 +9,11 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(defpackage :net.bardcode.folio.converting
-  (:use :cl)
-  (:export
-   :as
-   :type-for-copy))
+(in-package :net.bardcode.folio.converting)
 
-
-
+;;; function as
+;;;
+;;; (as type val) => an instance of type
+;;; ---------------------------------------------------------------------
+;;; returns a value equivalent to VAL whose type is TYPE
 

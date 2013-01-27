@@ -3,17 +3,19 @@
 ;;;;
 ;;;; Name:          package.lisp
 ;;;; Project:       folio - the Bard runtime
-;;;; Purpose:       uniform tools for converting values from one type to another
+;;;; Purpose:       scanning streams
 ;;;; Author:        mikel evins
 ;;;; Copyright:     2013 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
-(defpackage :net.bardcode.folio.converting
-  (:use :cl)
+(defpackage #:net.bardcode.folio.streams
+  (:use #:cl)
   (:export
-   :as
-   :type-for-copy))
+   #:characters
+   #:lines
+   #:objects
+   #:octets))
 
 
 

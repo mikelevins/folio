@@ -105,29 +105,64 @@
 (defmethod keys ((map series::foundation-series))
   (series:positions (series:map-fn 'boolean (constantly t) map)))
 
-;;; generic function merge
-;;; (merge map1 map2 &key (test 'equal)) => map3
+;;; generic function merge-tables
+;;; (merge-tables map1 map2 &key (test 'equal)) => map3
 ;;; ---------------------------------------------------------------------
 ;;; returns a new map constructed by combining the key/value pairs
-;;; from both MAP1 and MAP2. If a key appears in both maps then 
-;;; the value from MAP2 is used. Keys are compared using TEST.
+;;; from both MAP1 and MAP2. If a key appears in both maps then the
+;;; value from MAP2 is used. Keys are compared using TEST. sequences
+;;; and sequence-like objects are treated as maps from indexes to
+;;; elements.
 
-(defgeneric merge-maps (map1 map2 &key &allow-other-keys))
+(defgeneric merge-tables (map1 map2 &key &allow-other-keys))
 
-(defmethod merge-maps ((map1 sequence)(map2 sequence) &key &allow-other-keys)
+(defmethod merge-tables ((map1 sequence)(map2 sequence) &key &allow-other-keys)
   (if (<= (length map1)(length map2))
       map2
       (concatenate (type-of map1) map2 (subseq map1 (length map2)))))
 
-(defmethod merge-maps ((map1 fset:seq)(map2 fset:seq) &key &allow-other-keys)
+(defmethod merge-tables ((map1 sequence)(map2 fset:seq) &key &allow-other-keys)
+  (merge-tables map1 (fset:convert 'list map2)))
+
+(defmethod merge-tables ((map1 sequence)(map2 fset:map) &key &allow-other-keys)
+  (merge-tables (fset:convert 'fset:seq map1) map2))
+
+(defmethod merge-tables ((map1 sequence)(map2 series::foundation-series) &key &allow-other-keys)
+  (merge-tables (series:scan map1) map2))
+
+
+
+(defmethod merge-tables ((map1 fset:seq)(map2 sequence) &key &allow-other-keys)
+  (merge-tables map1 (fset:convert 'fset:seq map2)))
+
+(defmethod merge-tables ((map1 fset:seq)(map2 fset:seq) &key &allow-other-keys)
   (if (<= (fset:size map1)(fset:size map2))
       map2
       (fset:concat map2 (fset:subseq map1 (fset:size map2)))))
 
-(defmethod merge-maps ((map1 fset:map)(map2 fset:map) &key &allow-other-keys)
+(defmethod merge-tables ((map1 fset:seq)(map2 fset:map) &key &allow-other-keys)
+  )
+
+(defmethod merge-tables ((map1 fset:seq)(map2 series::foundation-series) &key &allow-other-keys)
+  )
+
+
+
+(defmethod merge-tables ((map1 fset:map)(map2 sequence) &key &allow-other-keys)
+  (merge-tables map1 (fset:convert 'fset:seq map2)))
+
+(defmethod merge-tables ((map1 fset:map)(map2 fset:seq) &key &allow-other-keys)
+  )
+
+(defmethod merge-tables ((map1 fset:map)(map2 fset:map) &key &allow-other-keys)
   (fset:map-union map1 map2))
 
-(defmethod merge-maps ((map1 series::foundation-series)(map2 series::foundation-series) &key &allow-other-keys)
+(defmethod merge-tables ((map1 fset:map)(map2 (map2 series::foundation-series)) &key &allow-other-keys)
+  )
+
+
+
+(defmethod merge-tables ((map1 series::foundation-series)(map2 series::foundation-series) &key &allow-other-keys)
   (labels ((nils () 
              (series:scan-fn 't 
                              (lambda () nil)
@@ -143,6 +178,7 @@
                                              (p1 m1)
                                              (t nil)))
                                       map2 pos2 map1 pos1)))))
+
 
 ;;; generic function put-key
 ;;; (put-key map1 key val (test 'equal)) => map2

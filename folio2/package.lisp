@@ -21,12 +21,13 @@
         :net.bardcode.folio.ordering
         :net.bardcode.folio.pairs
         :net.bardcode.folio.sets
+        :net.bardcode.folio.streams
         :net.bardcode.folio.text)
   (:export
    ;; boxes
    :@ :box :box? :set-box! :unbox
    ;; constructing
-   :make
+   :make :type-for-copy
    ;; converting
    :as
    ;; functions
@@ -40,10 +41,14 @@
    :first :generate :last :length :map :next-last :partition
    :reduce :rest :reverse :scan :second :some? :take :take-by
    ;; sets
+   ;; streams
+   :characters :lines :objects :octets
    ;; tables
-   :contains-key? :contains-value? :get-key :keys :merge-maps 
+   :contains-key? :contains-value? :get-key :keys :merge-tables
    :put-key :table :vals
    ;; text
    :join-text :split-text))
+
+
 
 
