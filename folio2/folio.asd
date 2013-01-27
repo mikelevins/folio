@@ -33,18 +33,9 @@
   :depends-on (:fset :series)
   :components ((:module "boxes"
                         :serial t
-                        :components ((:file "package")))))
-
-(asdf:defsystem :net.bardcode.folio.box-syntax
-  :serial t
-  :description "syntactic sugar for boxes"
-  :author "mikel evins <mevins@me.com>"
-  :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset :series :net.bardcode.folio.boxes)
-  :components ((:module "boxes"
-                        :serial t
                         :components ((:file "package")
-                                     (:file "syntax")))))
+                                     (:file "functions")
+                                     (:file "types")))))
 
 (asdf:defsystem :net.bardcode.folio.constructing
   :serial t
@@ -169,7 +160,6 @@
   :depends-on (:fset :series
                      :net.bardcode.folio.functions
                      :net.bardcode.folio.boxes 
-                     :net.bardcode.folio.box-syntax
                      :net.bardcode.folio.constructing
                      :net.bardcode.folio.converting
                      :net.bardcode.folio.sequences
